@@ -9,7 +9,7 @@ description: 毕业于合肥工业大学。先就职于cvte。
 author: Real
 email: 1227620310@qq.com
 keywords: "前端，typescript，react"
-avatar: "https://store-g1.seewo.com/d389d7faeebe4bdf82652ebfa7831892"
+avatar: /source/assets/images/avatar.jpg
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
@@ -35,10 +35,10 @@ filename_case: 0
 render_drafts: false
 post_asset_folder: false
 relative_link: false
-highlight:                                                                                                                                                                                                   
-  enable: true                                                                                                                                                                                               
-  auto_detect: true                                                                                                                                                                                          
-  line_number: true                                                                                                                                                                                          
+highlight:
+  enable: true
+  auto_detect: true
+  line_number: true
   tab_replace: ''
 
 # Category & Tag

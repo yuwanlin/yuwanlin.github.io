@@ -9,7 +9,7 @@ description: 毕业于合肥工业大学。先就职于cvte。
 author: Real
 email: 1227620310@qq.com
 keywords: "前端，typescript，react"
-avatar: /source/assets/images/avatar.jpg
+avatar: /assets/images/avatar.jpg
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'

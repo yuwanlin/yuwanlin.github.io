@@ -1,8 +1,9 @@
 ---
 title: React render是天然的模板方法
 date: 2020-01-01
-tags: 
-- react
+tags:
+- React
+- 设计模式
 categories:
 - 工作
 ---

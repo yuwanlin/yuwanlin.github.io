@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="毕业于合肥工业大学。先就职于cvte。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Real的博客">
+<meta property="og:url" content="https://yuwanlin.github.io/index.html">
+<meta property="og:site_name" content="Real的博客">
+<meta property="og:description" content="毕业于合肥工业大学。先就职于cvte。">
+<meta property="article:author" content="Real">
+<meta property="article:tag" content="前端，typescript，react">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yuwanlin.github.io/"/>
+
+
+
+
+
+  <title>Real的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+  page-home">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Real的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活的理想，是为了理想的生活。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+  <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yuwanlin.github.io/2020/01/01/render-template/index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Real">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/assets/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Real的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/01/render-template/index/" itemprop="url">React render是天然的模板方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-01T00:00:00+08:00">
+                2020-01-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C/" itemprop="url" rel="index">
+                    <span itemprop="name">工作</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>模板方法模式中，抽象父类定义一个模板方法，模板方法中封装了程序的步骤或者框架，其中有一些共同的步骤父类提供默认的实现。对于不同的部分，父类提供抽象方法，不同的子类根据场景需要重写父类抽象方法。父类模板方法应当是不能被重写的，对应在java中就是final关键字，但是js中没有这个关键字。</p>
+<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><p>模板方法模式适用于存在多个相同场景/步骤的情况下。比如泡茶和泡咖啡，都需要煮开水、放入原料、搅拌等步骤。虽然步骤名称相同，但是具体处理的内容可能是不同的（泡茶放入茶叶，泡咖啡放入咖啡粉末）。</p>
+<p>在前端，适用了那些同一个场景下多个不同的子场景，子场景拥有相同的元素（如图片，按钮，编辑框等），但是样式或者具体逻辑有所差别。</p>
+<h2 id="自定义模板方法"><a href="#自定义模板方法" class="headerlink" title="自定义模板方法"></a>自定义模板方法</h2><p>在使用<code>react</code>开发前端的过程中，一直没发现有什么好的方法使用模板方法模式，因为react的组件都是继承<code>React.Component</code>的，然后组件内实现render方法来输出内容。而导出的组件通过JSX写法<code>(&lt;Component /&gt;)</code>这种方式使用。对于开发者来说，它没有涉及到实例化这个步骤。强行使用模板方法模式会显得有些奇怪。</p>
+<p><img src="/assets/render-template/images/class-pic.png" alt=""></p>
+<p>上图中，<code>renderStudyInfo</code>是模板方法，模板方法中调用两个方法，用于渲染UI。其中一个是抽象方法，用于让子类去实现。另一个方法父类中定义了默认的实现，子类也可以重写该方法。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">private createStudyInfoStrategy(data: ModuleData) &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; source &#125; = <span class="keyword">this</span>.props;</span><br><span class="line">  <span class="keyword">let</span> studyContent: StudyContent;</span><br><span class="line">  <span class="keyword">const</span> &#123; courseType, trainSubType &#125; = data;</span><br><span class="line">  <span class="keyword">switch</span> (courseType) &#123;</span><br><span class="line">    <span class="keyword">case</span> COURSE_TYPE.CLASSICAL_COURSE:</span><br><span class="line">      studyContent = <span class="keyword">new</span> SpecialCourse(&#123; <span class="attr">moduleData</span>: data &#125;);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> COURSE_TYPE.TRAINING_CAMP:</span><br><span class="line">      <span class="keyword">if</span>(trainSubType === TrainSubType.TrainingCamp) &#123;</span><br><span class="line">        studyContent = <span class="keyword">new</span> TrainingCampV2(&#123; <span class="attr">moduleData</span>: data &#125;)</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span>(trainSubType === TrainSubType.GeneralClass || trainSubType === TrainSubType.RequiredClass) &#123;</span><br><span class="line">        studyContent = <span class="keyword">new</span> GeneralAndRequiredClass(&#123; <span class="attr">moduleData</span>: data, source &#125;)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        studyContent = <span class="keyword">new</span> OtherContent(&#123; <span class="attr">moduleData</span>: data &#125;);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">      studyContent = <span class="keyword">new</span> OtherContent(&#123; <span class="attr">moduleData</span>: data &#125;);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> studyContent;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">renderCourseInfo(data = &#123;&#125; <span class="keyword">as</span> ModuleData) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.createStudyInfoStrategy(data).renderStudyInfo();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用过程中，<code>createStudyInfoStrategy</code>相当于一个简单工厂方法，通过多态，可以定义实例的类型是<code>StudyContent</code>类型。得到具体的实例后，调用模板方法<code>renderStudyInfo</code>。</p>
+<p>为什么说奇怪呢，就在于子类都是继承父类<code>StudyContent</code>的，而父类又继承自<code>React.Component</code>。但是在使用子类的时候，我们又实例化了这个子类，第一个参数是React组件的props，通过这种方式子类可以使用props内容。</p>
+<h2 id="render是天然的模板方法"><a href="#render是天然的模板方法" class="headerlink" title="render是天然的模板方法"></a>render是天然的模板方法</h2><p>后来又做了一个需求，觉得实例化子类的方式显得不太优雅。就想到能否利用render方法作为模板方法呢。这样利用React的特性，它的内部会调用render方法，就不需要开发者再手动实例化子类，然后去调用模板方法了。事实证明是可行的。父类代码如下。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">abstract <span class="class"><span class="keyword">class</span> <span class="title">SendSuccessTemplate</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">SendSuccessTemplateProps</span>, </span>&#123;&#125;&gt; &#123;</span><br><span class="line"></span><br><span class="line">  abstract renderSubjectText(): JSX.Element;</span><br><span class="line">  abstract renderDefaultImage(): JSX.Element;</span><br><span class="line">  abstract renderUserText(): JSX.Element;</span><br><span class="line">  abstract renderDate(): JSX.Element;</span><br><span class="line">  abstract renderUserName(): JSX.Element;</span><br><span class="line"></span><br><span class="line">  renderQrCode(style: React.CSSProperties = &#123;&#125;) &#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  renderText() &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;&gt;</span><br><span class="line">        &#123; <span class="keyword">this</span>.renderSubjectText() &#125;</span><br><span class="line">        &#123; <span class="keyword">this</span>.renderUserText() &#125;</span><br><span class="line">      &lt;<span class="regexp">/&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">  render() &#123;</span></span><br><span class="line"><span class="regexp">    const &#123; currTemplate, hasQrCode &#125; = this.props;</span></span><br><span class="line"><span class="regexp">    return (</span></span><br><span class="line"><span class="regexp">      &lt;div styleName='wrapper'&gt;</span></span><br><span class="line"><span class="regexp">        &lt;div styleName=&#123;`send-success-template$&#123;currTemplate&#125;bg $&#123;hasQrCode ? 'hasQrCode' : ''&#125;`&#125;&gt;</span></span><br><span class="line"><span class="regexp">          &#123; this.renderDefaultImage() &#125;</span></span><br><span class="line"><span class="regexp">          &#123; this.renderText() &#125;</span></span><br><span class="line"><span class="regexp">          &#123; this.renderQrCode() &#125;</span></span><br><span class="line"><span class="regexp">          &#123; this.renderUserName() &#125;</span></span><br><span class="line"><span class="regexp">          &#123; this.renderDate() &#125;</span></span><br><span class="line"><span class="regexp">        &lt;/</span>div&gt;</span><br><span class="line">      &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>由于将render作为模板方法，那么子类继承父类后，只需要实现抽象方法即可，而子类不用再实现render方法了。使用的时候直接把子类当做React组件使用。就不需要再向上面的方式一样，实例化后再调用对应的模板方法了。使用方式如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">CreateSendSuccessTemplate</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; currTemplate &#125; = <span class="built_in">window</span>.data;</span><br><span class="line">  <span class="keyword">switch</span>(currTemplate) &#123;</span><br><span class="line">    <span class="keyword">case</span> Template.One:</span><br><span class="line">      <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">SendSuccessTemplate1</span> &#123; <span class="attr">...window.data</span> &#125; /&gt;</span></span></span><br><span class="line"><span class="xml">    case Template.Two:</span></span><br><span class="line">      return &lt;SendSuccessTemplate2 &#123; ...window.data &#125; /&gt;</span><br><span class="line">    case Template.Three:</span><br><span class="line">      return &lt;SendSuccessTemplate3 &#123; ...window.data &#125; /&gt;</span><br><span class="line">    case Template.Four:</span><br><span class="line">      return &lt;SendSuccessTemplate4 &#123; ...window.data &#125; /&gt;</span><br><span class="line">    case Template.Feedback:</span><br><span class="line">      return &lt;FeedbackCard &#123; ...(window as any).data &#125; /&gt;</span><br><span class="line">    default:</span><br><span class="line">      throw new Error('未知的模板类型');</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>前端由于其特殊性，不容易实现模板方法。将render作为模板方法是一个尝试，事实证明是可行的。</p>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ol>
+<li>使用模板方法模式来组织代码，代码可以得到极大程度的复用。</li>
+<li>在将来如果需要添加新的场景，只需要添加一个新的模板子类即可。</li>
+</ol>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ol>
+<li>模板方法不能被子类重写，但是ts并没有提供这一机制来保证子类不能重写父类方法，这一点需要开发人员明确。</li>
+<li>在使用了<code>react-css-modules</code>的情况下，如果公共方法是写在父类的，那么对应的样式文件一定要包括在父类的样式文件中。不过子类可以通过传入style的方法使用内联样式。</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+  </section>
+
+  
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/assets/images/avatar.jpg"
+                alt="Real" />
+            
+              <p class="site-author-name" itemprop="name">Real</p>
+              <p class="site-description motion-element" itemprop="description">毕业于合肥工业大学。先就职于cvte。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Real</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

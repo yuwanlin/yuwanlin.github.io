@@ -1,5 +1,5 @@
 ---
-title: render是天然的模板方法
+title: React render是天然的模板方法
 date: 2020-01-01
 tags: 
 - react
@@ -20,6 +20,7 @@ categories:
 在使用`react`开发前端的过程中，一直没发现有什么好的方法使用模板方法模式，因为react的组件都是继承`React.Component`的，然后组件内实现render方法来输出内容。而导出的组件通过JSX写法`(<Component />)`这种方式使用。对于开发者来说，它没有涉及到实例化这个步骤。强行使用模板方法模式会显得有些奇怪。
 
 ![](/assets/render-template/images/class-pic.png)
+
 
 上图中，`renderStudyInfo`是模板方法，模板方法中调用两个方法，用于渲染UI。其中一个是抽象方法，用于让子类去实现。另一个方法父类中定义了默认的实现，子类也可以重写该方法。
 

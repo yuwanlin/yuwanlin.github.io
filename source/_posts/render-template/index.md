@@ -1,11 +1,12 @@
 ---
 title: React render是天然的模板方法
 date: 2020-01-01
+updated: 2020-01-02
 tags:
 - React
 - 设计模式
 categories:
-- 工作
+- 前端
 ---
 
 ## 定义
@@ -25,7 +26,7 @@ categories:
 
 上图中，`renderStudyInfo`是模板方法，模板方法中调用两个方法，用于渲染UI。其中一个是抽象方法，用于让子类去实现。另一个方法父类中定义了默认的实现，子类也可以重写该方法。
 
-```js
+```typescript
 private createStudyInfoStrategy(data: ModuleData) {
   const { source } = this.props;
   let studyContent: StudyContent;
@@ -61,7 +62,7 @@ renderCourseInfo(data = {} as ModuleData) {
 
 ## render是天然的模板方法
 后来又做了一个需求，觉得实例化子类的方式显得不太优雅。就想到能否利用render方法作为模板方法呢。这样利用React的特性，它的内部会调用render方法，就不需要开发者再手动实例化子类，然后去调用模板方法了。事实证明是可行的。父类代码如下。
-```js
+```typescript
 abstract class SendSuccessTemplate extends React.Component<SendSuccessTemplateProps, {}> {
 
   abstract renderSubjectText(): JSX.Element;
@@ -101,7 +102,7 @@ abstract class SendSuccessTemplate extends React.Component<SendSuccessTemplatePr
 ```
 
 由于将render作为模板方法，那么子类继承父类后，只需要实现抽象方法即可，而子类不用再实现render方法了。使用的时候直接把子类当做React组件使用。就不需要再向上面的方式一样，实例化后再调用对应的模板方法了。使用方式如下：
-```js
+```typescript
 function CreateSendSuccessTemplate() {
   const { currTemplate } = window.data;
   switch(currTemplate) {

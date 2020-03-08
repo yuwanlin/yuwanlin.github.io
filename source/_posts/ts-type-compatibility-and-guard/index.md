@@ -4,8 +4,8 @@ tags:
 categories:
   - 前端
 title: ts 类型兼容性 与 类型守卫
-date:
-updated:
+date: 2020-03-02
+updated: 2020-03-03
 ---
 
 ## 前言

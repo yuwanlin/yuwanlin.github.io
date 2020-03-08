@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yuwanlin.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言Typescript 2.8 引入了条件类型。条件类型类似于js语法中的条件表达式，使用 condition ? A : B 语法，condition成立返回A类型，否则返回B类型。 条件类型1T extends U ? X : Y  上面的类型表示：若T能够赋值给U[1]，那么类型是X，否则为Y。如： 1234567891011121314type A&lt;T, U&gt; &#x3D; T ext">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ts 条件类型、infer、协变与逆变">
+<meta property="og:url" content="https://yuwanlin.github.io/2020/03/08/ts-contional-types/index/index.html">
+<meta property="og:site_name" content="Real的博客">
+<meta property="og:description" content="前言Typescript 2.8 引入了条件类型。条件类型类似于js语法中的条件表达式，使用 condition ? A : B 语法，condition成立返回A类型，否则返回B类型。 条件类型1T extends U ? X : Y  上面的类型表示：若T能够赋值给U[1]，那么类型是X，否则为Y。如： 1234567891011121314type A&lt;T, U&gt; &#x3D; T ext">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-03-08T11:40:34.057Z">
+<meta property="article:author" content="Real">
+<meta property="article:tag" content="typescript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://yuwanlin.github.io/2020/03/08/ts-contional-types/index/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>ts 条件类型、infer、协变与逆变 | Real的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Real的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">生活的理想，是为了理想的生活。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/yuwanlin" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yuwanlin.github.io/2020/03/08/ts-contional-types/index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/images/avatar.jpg">
+      <meta itemprop="name" content="Real">
+      <meta itemprop="description" content="毕业于合肥工业大学。先就职于cvte。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Real的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ts 条件类型、infer、协变与逆变
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-08 00:00:00 / 修改时间：19:40:34" itemprop="dateCreated datePublished" datetime="2020-03-08T00:00:00+08:00">2020-03-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html" target="_blank" rel="noopener">Typescript 2.8</a> 引入了条件类型。条件类型类似于js语法中的条件表达式，使用 <code>condition ? A : B</code> 语法，condition成立返回A类型，否则返回B类型。</p>
+<h2 id="条件类型"><a href="#条件类型" class="headerlink" title="条件类型"></a>条件类型</h2><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">T <span class="keyword">extends</span> U ? X : Y</span><br></pre></td></tr></table></figure>
+
+<p>上面的类型表示：若T能够赋值给U<sup>[1]</sup>，那么类型是X，否则为Y。如：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> A&lt;T, U&gt; = T <span class="keyword">extends</span> U ? <span class="built_in">number</span> : <span class="built_in">string</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Fun1 = <span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line"><span class="keyword">type</span> Fun2 = <span class="function">(<span class="params">a: <span class="built_in">string</span></span>) =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> A1 = A&lt;Fun1, Fun2&gt; <span class="comment">// number</span></span><br><span class="line"><span class="keyword">type</span> A2 = A&lt;Fun2, Fun1&gt; <span class="comment">// string</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Obj1 = &#123;&#125;;</span><br><span class="line"><span class="keyword">type</span> Obj2 = &#123; name: <span class="built_in">string</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> A3 = A&lt;Obj1, Obj2&gt;; <span class="comment">// string;</span></span><br><span class="line"><span class="keyword">type</span> A4 = A&lt;Obj2, Obj1&gt;; <span class="comment">// number</span></span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>在 <a href="https://yuwanlin.github.io/2020/03/02/ts-type-compatibility-and-guard/index/">类型兼容性</a> 文中说到函数的兼容性，所以这里 Fun1 是可以赋值给 Fun2 的，反之就不行。但是对象这里可能有点疑惑，可以这么理解，Obj1 是父类，Obj2 是子类，Obj2继承Obj1，并添加了自己的属性。</p>
+<p>可以看到，条件类型和js中的条件表达式也是很相似的，它也支持条件类型的嵌套。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Box&lt;T&gt; = </span><br><span class="line">  T <span class="keyword">extends</span> <span class="built_in">number</span> ? <span class="built_in">number</span> :</span><br><span class="line">  T <span class="keyword">extends</span> <span class="built_in">string</span> ? <span class="built_in">string</span> :</span><br><span class="line">  T <span class="keyword">extends</span> <span class="built_in">boolean</span> ? <span class="built_in">boolean</span> :</span><br><span class="line">  <span class="literal">undefined</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> A = Box&lt;<span class="built_in">number</span>&gt;;</span><br><span class="line"><span class="keyword">type</span> B = Box&lt;<span class="built_in">string</span>&gt;;</span><br><span class="line"><span class="keyword">type</span> C = Box&lt;[]&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="分布式有条件类型"><a href="#分布式有条件类型" class="headerlink" title="分布式有条件类型"></a>分布式有条件类型</h2><p>条件类型中，如果待检查的类型是裸类型参数(naked type parameter)，那么它也被称为分布式有条件类型。</p>
+<p>所谓裸类型参数就是指待检查的类型没有被包装在其他类型中，如数组，元祖，函数，Promise等。</p>
+<p>上述例子中，待检查的类型是 T，T 就是裸类型。如下，不是裸类型参数：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> A&lt;T, U&gt; = [T] <span class="keyword">extends</span> [U] ? <span class="built_in">number</span> : <span class="built_in">string</span>;</span><br></pre></td></tr></table></figure>
+
+<p>那么为什么要弄个分布式有条件类型出来呢？根据官方文档解释，分布式有条件类型在实例化时会自动分发成联合类型。 例如，实例化 <code>T extends U ? X : Y</code>，T 的类型为<code>A | B | C</code>，会被解析为<code>(A extends U ? X : Y) | (B extends U ? X : Y) | (C extends U ? X : Y)</code>。</p>
+<p>根据这个特性，可以设计很多类型，如下的 Diff 和 Filter：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Diff&lt;T, U&gt; = T <span class="keyword">extends</span> U ? never : T;</span><br><span class="line"><span class="keyword">type</span> Filter&lt;T, U&gt; = T <span class="keyword">extends</span> U ? T : never;</span><br><span class="line"><span class="keyword">type</span> NonNullabled&lt;T&gt; = Diff&lt;T, <span class="literal">null</span> | <span class="literal">undefined</span>&gt;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> animal = <span class="string">'chicken'</span> | <span class="string">'duck'</span> | <span class="string">'lion'</span> | <span class="string">'elephant'</span> | <span class="string">'tiger'</span>;</span><br><span class="line"><span class="keyword">type</span> food = <span class="string">'chicken'</span> | <span class="string">'duck'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> DiffResult = Diff&lt;animal, food&gt;; <span class="comment">// "lion" | "elephant" | "tiger"</span></span><br><span class="line"><span class="keyword">type</span> FilterResult = Filter&lt;animal, food&gt;; <span class="comment">// "chicken" | "duck"</span></span><br><span class="line"><span class="keyword">type</span> Valued = NonNullabled&lt;<span class="built_in">number</span> | <span class="built_in">string</span> | <span class="literal">undefined</span>&gt; <span class="comment">// string | number</span></span><br></pre></td></tr></table></figure>
+
+<p>上面类似中，animal 和 food 都是字面量联合类型，并且 Diff 和 Filter 都是分布式有条件类型，在实例化（使用）的时候会自动分发成联合类型，就好像对 animal 中每一个字面量都进行了遍历一样，</p>
+<h2 id="infer"><a href="#infer" class="headerlink" title="infer"></a>infer</h2><p>ts 中有一个关键字infer，它表示待推断的类型。比如要获得一个函数的返回值的类型，但是在条件类型实例化之前我们不知道开发者传入的的函数的返回类型是什么，借助 infer 关键字可以很好的解决这个问题。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ReturnType2&lt;T&gt; = T <span class="keyword">extends</span> (...args: <span class="built_in">any</span>[]) =&gt; infer U ? U : <span class="built_in">any</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Result = ReturnType2&lt;<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">number</span>&gt; <span class="comment">// number</span></span><br><span class="line"><span class="keyword">type</span> Result2 = ReturnType2&lt;<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">string</span>&gt; <span class="comment">// string</span></span><br></pre></td></tr></table></figure>
+
+<p>在 ts 的 lib.es5.d.ts 声明文件中，声明了很多类型。使用 infer 的有：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获得函数的各个参数类型，以元祖表示</span></span><br><span class="line"><span class="keyword">type</span> Parameters&lt;T <span class="keyword">extends</span> (...args: <span class="built_in">any</span>) =&gt; <span class="built_in">any</span>&gt; = T <span class="keyword">extends</span> (...args: infer P) =&gt; <span class="built_in">any</span> ? P : never;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获得类的构造函数的参数类型，以元祖表示</span></span><br><span class="line"><span class="keyword">type</span> ConstructorParameters&lt;T <span class="keyword">extends</span> <span class="keyword">new</span> (...args: <span class="built_in">any</span>) =&gt; <span class="built_in">any</span>&gt; = T <span class="keyword">extends</span> <span class="keyword">new</span> (...args: infer P) =&gt; <span class="built_in">any</span> ? P : never;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获得函数的返回值的类型</span></span><br><span class="line"><span class="keyword">type</span> ReturnType&lt;T <span class="keyword">extends</span> (...args: <span class="built_in">any</span>) =&gt; <span class="built_in">any</span>&gt; = T <span class="keyword">extends</span> (...args: <span class="built_in">any</span>) =&gt; infer R ? R : <span class="built_in">any</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获得构造函数的返回值的类型，也就是类的实例的类型</span></span><br><span class="line"><span class="keyword">type</span> InstanceType&lt;T <span class="keyword">extends</span> <span class="keyword">new</span> (...args: <span class="built_in">any</span>) =&gt; <span class="built_in">any</span>&gt; = T <span class="keyword">extends</span> <span class="keyword">new</span> (...args: <span class="built_in">any</span>) =&gt; infer R ? R : <span class="built_in">any</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，上述这些使用 infer 的场景都使用到了条件类型，条件类型结合 infer 是ts中最强大的武器。</p>
+<h2 id="协变与逆变"><a href="#协变与逆变" class="headerlink" title="协变与逆变"></a>协变与逆变</h2><p>在谈论协变与逆变之前，先看如下例子：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Foo&lt;T&gt; = T <span class="keyword">extends</span> &#123; a: <span class="function"><span class="params">()</span> =&gt;</span> infer U, b: <span class="function"><span class="params">()</span> =&gt;</span> infer U &#125; ? U : <span class="literal">undefined</span>;</span><br><span class="line"><span class="keyword">type</span> R1 = Foo&lt;&#123;a: <span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">string</span>, b: <span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">number</span>&#125;&gt; <span class="comment">// string | number</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Bar&lt;T&gt; = T <span class="keyword">extends</span> &#123; a: <span class="function">(<span class="params">x: infer U</span>) =&gt;</span> <span class="built_in">any</span>, b: <span class="function">(<span class="params">x: infer U</span>) =&gt;</span> <span class="built_in">any</span> &#125; ? U : <span class="literal">undefined</span>;</span><br><span class="line"><span class="keyword">type</span> R2 = Bar&lt;&#123;a: <span class="function">(<span class="params">x: <span class="built_in">string</span></span>) =&gt;</span> <span class="built_in">void</span>, b: <span class="function">(<span class="params">x: <span class="built_in">number</span></span>) =&gt;</span> <span class="built_in">any</span>&#125;&gt; <span class="comment">// never</span></span><br></pre></td></tr></table></figure>
+
+<p><code>Foo&lt;T&gt;</code> 的例子从直观看起来就是这样，而 <code>Bar&lt;T&gt;</code> 的例子可能会让人疑惑，这里的 never 实际上是 string &amp; number。也就是说，第一种情况下，U 的多个候选类型在实例化的时候被推算为联合类型；第二种情况下，U 的多个候选类型被推断为交叉类型。</p>
+<p>根据官方的解释：</p>
+<blockquote>
+<p>在协变位置上，同一个类型变量的多个候选类型会被推断为联合类型</p>
+<p>在逆变位置上，同一个类型变量的多个候选类型会被推断为交叉类型</p>
+</blockquote>
+<p>所以从上面的例子，至少我们可以得出结论，函数返回值是协变的，函数参数是逆变的。实际上，函数的返回值，对象的值都是协变的。</p>
+<p>那么到底什么是协变和逆变？凭我的水平很难解释清楚，<a href="https://jkchao.github.io/typescript-book-chinese/tips/covarianceAndContravariance.html" target="_blank" rel="noopener">这里有一篇非常好的文章</a>。</p>
+<h2 id="条件类型与infer的应用"><a href="#条件类型与infer的应用" class="headerlink" title="条件类型与infer的应用"></a>条件类型与infer的应用</h2><p>有个经典的案例，将联合类型转为交叉类型，可以概括本文内容。如：number | string -&gt; number &amp; string</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> UnionToIntersection&lt;U&gt; = <span class="function">(<span class="params">U <span class="keyword">extends</span> <span class="built_in">any</span> ? (<span class="params">k: U</span>) =&gt; <span class="built_in">void</span> : never</span>) <span class="params">extends</span> (<span class="params">(<span class="params">k: infer I</span>) =&gt; <span class="built_in">void</span></span>) ? <span class="params">I</span> : <span class="params">undefined</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="params">type</span> <span class="params">Result</span> = <span class="params">UnionToIntersection</span>&lt;<span class="params">string</span> | <span class="params">number</span>&gt;;</span></span><br></pre></td></tr></table></figure>
+
+<p>Result 是 string &amp; number，即 never 类型，讲讲为什么会这样。</p>
+<p>上面的条件类型要分为两部分来看，第一部分是<code>(U extends any ? (k: U) =&gt; void : never)</code>。这里的 U 是裸类型参数。前面说过，对于裸类型参数，分布式有条件类型会在实例化的时候被分发为条件类型。所以传入<code>string | number</code>，在这一部分会被分发为 <code>((k: string) =&gt; void) | ((k: number) =&gt; void)</code>。</p>
+<p>然后将第一部分作为一个整体。作为整体来看，它的待推断类型是<code>(U extends any ? (k: U) =&gt; void : never)</code>, 不是裸类型参数。待推断的类型 I 处于函数参数的位置，它是逆变的。根据上述定义，在逆变位置上，同一个类型变量的多个候选类型会被推断为交叉类型。这里的候选类型是string和number，推断为交叉类型后就是never。</p>
+<h2 id="备注："><a href="#备注：" class="headerlink" title="备注："></a>备注：</h2><p>[1] <a href="https://yuwanlin.github.io/2020/03/02/ts-type-compatibility-and-guard/index/">类型兼容性</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/typescript/" rel="tag"># typescript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/02/ts-type-compatibility-and-guard/index/" rel="prev" title="ts 类型兼容性 与 类型守卫">
+      <i class="fa fa-chevron-left"></i> ts 类型兼容性 与 类型守卫
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#条件类型"><span class="nav-number">2.</span> <span class="nav-text">条件类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式有条件类型"><span class="nav-number">3.</span> <span class="nav-text">分布式有条件类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#infer"><span class="nav-number">4.</span> <span class="nav-text">infer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#协变与逆变"><span class="nav-number">5.</span> <span class="nav-text">协变与逆变</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#条件类型与infer的应用"><span class="nav-number">6.</span> <span class="nav-text">条件类型与infer的应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#备注："><span class="nav-number">7.</span> <span class="nav-text">备注：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Real"
+      src="/assets/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Real</p>
+  <div class="site-description" itemprop="description">毕业于合肥工业大学。先就职于cvte。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yuwanlin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yuwanlin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Real</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '561fdcc2fc7b29e33a3e',
+      clientSecret: 'cfca792daa526d7ee752ff5f5040d41f6bb0af68',
+      repo        : 'yuwanlin.github.io',
+      owner       : 'yuwanlin',
+      admin       : ['yuwanlin'],
+      id          : '2d8c6fc7f02686442472c2564545ca6a',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

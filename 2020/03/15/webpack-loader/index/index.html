@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yuwanlin.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在 webapck 中，一切皆模块。而 webpack 本质上是一个现代 JavaScript 应用程序的静态模块打包工具。因此，无论什么格式的文件，都需要转换成js可以识别的模块。比如图片文件、字体文件、css文件等，但是这些文件类型直接当做js模块使用是不被js模块系统理解的，所以需要一种方式将它们转换为js模块再使用–这个模块的转换过程由 webpack 的 loader 处理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webpack loader">
+<meta property="og:url" content="https://yuwanlin.github.io/2020/03/15/webpack-loader/index/index.html">
+<meta property="og:site_name" content="Real的博客">
+<meta property="og:description" content="在 webapck 中，一切皆模块。而 webpack 本质上是一个现代 JavaScript 应用程序的静态模块打包工具。因此，无论什么格式的文件，都需要转换成js可以识别的模块。比如图片文件、字体文件、css文件等，但是这些文件类型直接当做js模块使用是不被js模块系统理解的，所以需要一种方式将它们转换为js模块再使用–这个模块的转换过程由 webpack 的 loader 处理。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://store-g1.seewo.com/4b0b2f9cd91748779bf785b581cb17d7">
+<meta property="og:image" content="https://store-g1.seewo.com/135b05a2117f4ecea60e44633504b22a">
+<meta property="article:published_time" content="2020-03-15T13:07:03.807Z">
+<meta property="article:modified_time" content="2020-03-28T16:48:36.643Z">
+<meta property="article:author" content="Real">
+<meta property="article:tag" content="webpack">
+<meta property="article:tag" content="loader">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://store-g1.seewo.com/4b0b2f9cd91748779bf785b581cb17d7">
+
+<link rel="canonical" href="https://yuwanlin.github.io/2020/03/15/webpack-loader/index/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>webpack loader | Real的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Real的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">生活的理想，是为了理想的生活。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/yuwanlin" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yuwanlin.github.io/2020/03/15/webpack-loader/index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/images/avatar.jpg">
+      <meta itemprop="name" content="Real">
+      <meta itemprop="description" content="毕业于合肥工业大学。就职于cvte。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Real的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          webpack loader
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-15 21:07:03" itemprop="dateCreated datePublished" datetime="2020-03-15T21:07:03+08:00">2020-03-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-29 00:48:36" itemprop="dateModified" datetime="2020-03-29T00:48:36+08:00">2020-03-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://store-g1.seewo.com/4b0b2f9cd91748779bf785b581cb17d7" alt=""></p>
+<p>在 webapck 中，一切皆<a href="https://webpack.docschina.org/concepts/modules" target="_blank" rel="noopener">模块</a>。而 webpack 本质上是一个现代 JavaScript 应用程序的静态模块打包工具。因此，无论什么格式的文件，都需要转换成js可以识别的模块。比如图片文件、字体文件、css文件等，但是这些文件类型直接当做js模块使用是不被js模块系统理解的，所以需要一种方式将它们转换为js模块再使用–这个模块的转换过程由 webpack 的 loader 处理。</p>
+<a id="more"></a>
+
+<h2 id="loader的用法"><a href="#loader的用法" class="headerlink" title="loader的用法"></a>loader的用法</h2><p>loader有三种使用方式，分别是：</p>
+<ul>
+<li>配置：在webpack配置文件中针对不同类型的文件制定loader，这也是推荐的方式</li>
+<li>内联：在import语句中指定loader</li>
+<li>CLI：在shell命令中使用</li>
+</ul>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>在webpack配置文件中可以方便得配置多个loader，看起来简单明了，对业务代码无倾入、统一配置便于维护。</p>
+<p>loader从右到左（从下到上）顺序执行，如下部分：先执行sass-load，然后执行css-loader，再执行style-loader。</p>
+<p>use 是一个数组，其中的loader可以是一个字符串，也可以是一个对象。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="keyword">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.scss$/</span>,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'style-loader'</span></span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'css-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              modules: <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;,</span><br><span class="line">          &#123; loader: <span class="string">'sass-loader'</span> &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>由于这种方式可读性好、易修改、易维护、对业务代码无倾入，所以推荐使用这种方式。</p>
+<p>在开发自己的loader时，为了便于获取这些参数，webpack提供了 <a href="https://github.com/webpack/loader-utils" target="_blank" rel="noopener">loader-utils</a> 这个包。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> loaderUtils = <span class="built_in">require</span>(<span class="string">"loader-utils"</span>);</span><br><span class="line"><span class="keyword">const</span> options = loaderUtils.getOptions(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="内联"><a href="#内联" class="headerlink" title="内联"></a>内联</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'style-loader!css-loader?module!sass-loader./style.scss'</span></span><br></pre></td></tr></table></figure>
+<p>使用内联方式，以<code>!</code>分隔loader。内联loader的配置可以覆盖webpack中loader的配置。</p>
+<p>每个loader可以使用参数，例如<code>?key=value&amp;key2=value2</code>，或者一个json对象，如<code>?{key: value}</code>。</p>
+<h3 id="CLI"><a href="#CLI" class="headerlink" title="CLI"></a>CLI</h3><p>这种方式用的比较少了，我在开发中没有用过。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">webpack --<span class="keyword">module</span>-bind jade-loader --<span class="keyword">module</span>-bind 'css=style-loader!css-loader'</span><br></pre></td></tr></table></figure>
+
+<h2 id="loader是什么"><a href="#loader是什么" class="headerlink" title="loader是什么"></a>loader是什么</h2><p>实际上，loader就是一个导出为函数的js模块，不过这个函数需要遵循一定的输入输出。<a href="https://github.com/webpack/loader-runner" target="_blank" rel="noopener">loader-runner</a> 会执行这个函数。如果有多个loader的时候，它们从右至左（从下至上）被执行。最先执行的loader接受资源文件，将处理后的返回结果传递给下一个loader，直至最后一个loader处理。loader接受的的资源类型可能是一个String或者一个Buffer（通过设置raw），最终输出一个字符串或者不输出（pitching loader）。另外还可以传递一个可选的 <a href="https://github.com/mozilla/source-map" target="_blank" rel="noopener">SourceMap</a> 结果（格式为 JSON 对象）。</p>
+<p>需要说明的是所有的loader的导出都需要符合 commonjs 规范，因为webpack（loader） 运行在 Node.js 中。书写loader的过程中可以使用es模块编写，最后通过 babel 转换成 commonjs 模块规范即可。</p>
+<p>话不多说，先进入代码吧<del>~</del></p>
+<h2 id="最简单的loader-–-raw-loader"><a href="#最简单的loader-–-raw-loader" class="headerlink" title="最简单的loader – raw-loader"></a>最简单的loader – raw-loader</h2><p>raw-loader源码非常简单，它的作用就是将引入的文件当做一个字符串处理。如果引入的文件不是文本格式的，会得到一堆乱码。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 关键代码如下</span></span><br><span class="line"><span class="keyword">import</span> &#123; getOptions &#125; <span class="keyword">from</span> <span class="string">'loader-utils'</span>;</span><br><span class="line"><span class="keyword">import</span> validateOptions <span class="keyword">from</span> <span class="string">'schema-utils'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> schema <span class="keyword">from</span> <span class="string">'./options.json'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">rawLoader</span>(<span class="params">source</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 获取使用loader时的option</span></span><br><span class="line">  <span class="keyword">const</span> options = getOptions(<span class="keyword">this</span>) || &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 验证option中字段有效性</span></span><br><span class="line">  validateOptions(schema, options, &#123;</span><br><span class="line">    name: <span class="string">'Raw Loader'</span>,</span><br><span class="line">    baseDataPath: <span class="string">'options'</span>,</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// source 是命中的资源文件</span></span><br><span class="line">  <span class="keyword">const</span> json = <span class="built_in">JSON</span>.stringify(source)</span><br><span class="line">    .replace(<span class="regexp">/\u2028/g</span>, <span class="string">'\\u2028'</span>)</span><br><span class="line">    .replace(<span class="regexp">/\u2029/g</span>, <span class="string">'\\u2029'</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> esModule =</span><br><span class="line">    <span class="keyword">typeof</span> options.esModule !== <span class="string">'undefined'</span> ? options.esModule : <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;esModule ? <span class="string">'export default'</span> : <span class="string">'module.exports ='</span>&#125;</span> <span class="subst">$&#123;json&#125;</span>;`</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/webpack/loader-utils" target="_blank" rel="noopener">loader-utils</a> 是webpack提供的一个针对loader的工具库，其中提供了很多方便的方法用于开发者在编写loader时候使用。getOptions 用于获取webpack中配置loader时候的options。parseQuery 用于解析内联loader的参数。</p>
+<p><a href="https://github.com/webpack/schema-utils" target="_blank" rel="noopener">schema-utils</a> 是对loader-utils的封装，用于验证传参的合法性。</p>
+<p>\u2028 是行分隔符，\u2029 是段落分隔符。由于历史原因，这两个unicode码点是可以在json中存在的，但是在js中通过JSON.stringify这两个码点会出现问题。这一点在最近有所改变，这两个码点既可以在json中存在，也可以在js中通过JSON.stringify来处理。所以为了兼容旧的浏览器，需要如上处理。<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Issue_with_plain_JSON.stringify_for_use_as_JavaScript" target="_blank" rel="noopener">MDN上有对于此的介绍</a>。</p>
+<p>最后将JSON.stringify后的内容导出。默认以es6模块规范导出，因为webpack2开始原生支持es6模块规范。</p>
+<p>raw-loader 相当简单，非常适合入门理解。</p>
+<h2 id="loader特性"><a href="#loader特性" class="headerlink" title="loader特性"></a>loader特性</h2><p>loader有它的一些特性。</p>
+<ol>
+<li><p>loader支持链式传递<br>在之前已经介绍过。这类似于洋葱模型。所以多个loader的时候，是有一个进出的过程。这在下面的pitching loader中会提到。</p>
+</li>
+<li><p>loader可以是同步的，也可以是异步的<br>如果一个loader是单个处理结果，可以通过同步操作直接返回。如果是多个处理结果，可以通过 <code>this.callback</code>（同步模式） 返回，也可以通过 <code>this.async</code>（异步模式） 返回。<code>this.async()</code> 执行后的返回值是<code>this.callback</code></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 同步模式</span></span><br><span class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">content, map, meta</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> someSyncOperation(content);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">content, map, meta</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.callback(<span class="literal">null</span>, someSyncOperation(content), map, meta);</span><br><span class="line">  <span class="keyword">return</span>; <span class="comment">// 当调用 callback() 时总是返回 undefined</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 异步模式</span></span><br><span class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">content, map, meta</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> callback = <span class="keyword">this</span>.async();</span><br><span class="line">  someAsyncOperation(content, <span class="function"><span class="keyword">function</span>(<span class="params">err, result</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (err) <span class="keyword">return</span> callback(err);</span><br><span class="line">    callback(<span class="literal">null</span>, result, map, meta);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>对于计算比较量比较大的过程，推荐使用异步loader。如果返回的内容不是es6或者commonjs导出（如上raw-loader），那么要确保下一个loader可以处理返回的内容。</p>
+</li>
+<li><p>支持插件<br>插件可以为loader提供更多的能力。比如postcss-loader。可以对css文件进行进一步的处理。</p>
+</li>
+</ol>
+<p>下面的配置中，将px布局转为rem布局，然后针对目标浏览器添加兼容性代码。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  loader: <span class="string">'postcss-loader'</span>,</span><br><span class="line">  options: &#123;</span><br><span class="line">    plugins: [</span><br><span class="line">      postcssAutoprefixer(&#123;</span><br><span class="line">        browsers: targetBrowsers</span><br><span class="line">      &#125;),</span><br><span class="line">      px2rem(&#123;</span><br><span class="line">        remUnit: <span class="number">75</span></span><br><span class="line">      &#125;),</span><br><span class="line">    ],</span><br><span class="line">    sourceMap: <span class="literal">false</span>,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>loader能够产生额外的任意文件<br>比如使用 <a href="https://github.com/webpack-contrib/file-loader/blob/master/src/index.js" target="_blank" rel="noopener">file-loader</a> 处理图片，能够将源图片输出一份到目标文件夹下。</li>
+</ol>
+<h2 id="“Raw”-loader-与-url-loader"><a href="#“Raw”-loader-与-url-loader" class="headerlink" title="“Raw” loader 与 url-loader"></a>“Raw” loader 与 url-loader</h2><p>默认情况下，资源文件会被转换为utf-8字符串，然后传给loader。通过设置raw，loader可以接受原始内容的Buffer。每一个loader都可以用字符串或Buffer传递它的处理结果。</p>
+<figure class="highlight openscad"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">module</span>.<span class="title">exports</span> =</span> <span class="function"><span class="keyword">function</span><span class="params">(content)</span> &#123;</span></span><br><span class="line">  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">module</span>.<span class="title">exports</span>.<span class="title">raw</span> =</span> <span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+<p>只有一个loader的时候，如果该loader设置raw为true，那么获得的content内容就是一个Buffer。</p>
+<p>前面说到 <a href="https://github.com/webpack/loader-runner/blob/master/lib/LoaderRunner.js" target="_blank" rel="noopener">loader-runner</a> 会执行loader，它的源码会对content进行转换。</p>
+<p>如果设置了raw并且接受到的content是字符串，会转换为Buffer。如果没有设置raw并且是Buffer，会首先被转换成字符串。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">utf8BufferToString</span>(<span class="params">buf</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = buf.toString(<span class="string">"utf-8"</span>);</span><br><span class="line">  <span class="keyword">if</span>(str.charCodeAt(<span class="number">0</span>) === <span class="number">0xFEFF</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> str.substr(<span class="number">1</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> str;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">convertArgs</span>(<span class="params">args, raw</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(!raw &amp;&amp; Buffer.isBuffer(args[<span class="number">0</span>]))</span><br><span class="line">    args[<span class="number">0</span>] = utf8BufferToString(args[<span class="number">0</span>]);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span>(raw &amp;&amp; <span class="keyword">typeof</span> args[<span class="number">0</span>] === <span class="string">"string"</span>)</span><br><span class="line">    args[<span class="number">0</span>] = Buffer.from(args[<span class="number">0</span>], <span class="string">"utf-8"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Buffer.from 是 nodejs 的API，可以将一个字符串转换为Buffer。</p>
+<h3 id="url-loader"><a href="#url-loader" class="headerlink" title="url-loader"></a>url-loader</h3><p><a href="https://github.com/webpack-contrib/url-loader" target="_blank" rel="noopener">url-loader</a> 是对file-loader的封装，它的options有一个属性 limit，当输入的内容的字节小于 limit 的大小时，会以base64的形式输出内容。否则，让file-loader处理。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (shouldTransform(options.limit, src.length)) &#123;</span><br><span class="line"> <span class="keyword">const</span> file = <span class="keyword">this</span>.resourcePath;</span><br><span class="line"> <span class="keyword">const</span> mimetype = options.mimetype || mime.contentType(path.extname(file));</span><br><span class="line"></span><br><span class="line"> <span class="keyword">if</span> (<span class="keyword">typeof</span> src === <span class="string">'string'</span>) &#123;</span><br><span class="line">   <span class="comment">// eslint-disable-next-line no-param-reassign</span></span><br><span class="line">   src = Buffer.from(src);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">const</span> esModule =</span><br><span class="line">   <span class="keyword">typeof</span> options.esModule !== <span class="string">'undefined'</span> ? options.esModule : <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;</span></span></span><br><span class="line"><span class="string"><span class="subst">   esModule ? <span class="string">'export default'</span> : <span class="string">'module.exports ='</span></span></span></span><br><span class="line"><span class="string"><span class="subst"> &#125;</span> <span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(</span></span></span><br><span class="line"><span class="string"><span class="subst">   <span class="string">`data:<span class="subst">$&#123;mimetype || <span class="string">''</span>&#125;</span>;base64,<span class="subst">$&#123;src.toString(<span class="string">'base64'</span>)&#125;</span>`</span></span></span></span><br><span class="line"><span class="string"><span class="subst"> )&#125;</span>`</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>url-loader一般用于对资源文件（图片文件/字体文件等）进行处理。源码中的src就是一个Buffer。如果符合条件，就将Buffer转换为base64。</p>
+<h2 id="pitching"><a href="#pitching" class="headerlink" title="pitching"></a>pitching</h2><p>loader按照类型可分为前置(pre)、行内(inline)、普通(normal)、后置(post)。<br>多个loader执行时类似洋葱模型，符合新进后出的过程。所以就分为两个阶段。进的过程称为pitching阶段，出的过程称为normal阶段，也就是上面提到的从右往左执行。</p>
+<p>pitching 阶段：loader 上的 pitch 方法，按照 后置(post)、行内(inline)、普通(normal)、前置(pre) 的顺序调用。<br>normal阶段：loader 上的 常规方法，按照 前置(pre)、普通(normal)、行内(inline)、后置(post) 的顺序调用。模块源码的转换，发生在这个阶段。</p>
+<p>所有普通 loader 可以通过在请求中加上 <code>!</code> 前缀来忽略（覆盖）。<br>所有普通和前置 loader 可以通过在请求中加上 <code>-!</code> 前缀来忽略（覆盖）。<br>所有普通，后置和前置 loader 可以通过在请求中加上 <code>!!</code> 前缀来忽略（覆盖）。<br>不推荐在业务代码中使用行内 loader 和 <code>!</code> 前缀，因为它们是非标准的。不过它们可在由 loader 生成的代码中使用。</p>
+<p>这里的覆盖是指覆盖同名的loader。比如对同一个文件的相同的loader配置了多种类型：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lazyDom <span class="keyword">from</span> <span class="string">'bundle-loader?name=rd1!react-dom'</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  test: <span class="regexp">/react-dom/</span>,</span><br><span class="line">  use: [</span><br><span class="line">    &#123; </span><br><span class="line">      loader: <span class="string">'bundle-loader'</span>,</span><br><span class="line">      options: &#123;</span><br><span class="line">        name: <span class="string">'rd2'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这时候，内联loader的配置通过 ! 前缀可以覆盖webpack中相同loader的配置。</p>
+<p>前置loader</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  test: <span class="regexp">/\.jsx?$/</span>,</span><br><span class="line">  enforce: <span class="string">'pre'</span>,</span><br><span class="line">  include: [SOURCE_PATH],</span><br><span class="line">  use: [&#123;</span><br><span class="line">    loader: <span class="string">'eslint-loader'</span>,</span><br><span class="line">    options: &#123;</span><br><span class="line">      plugins: [</span><br><span class="line">        <span class="string">'eslint-plugin-react'</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对资源文件使用了多个loader情况下，如：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use: [</span><br><span class="line">  <span class="string">'a-loader'</span>,</span><br><span class="line">  <span class="string">'b-loader'</span>,</span><br><span class="line">  <span class="string">'c-loader'</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>那么实际上它的执行过程如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a-loader.pitch</span><br><span class="line">  b-loader.pitch</span><br><span class="line">    c-loader.pitch</span><br><span class="line">      资源文件（在normal阶段被处理）</span><br><span class="line">    c-loader.normal</span><br><span class="line">  b-loader.normal</span><br><span class="line">a-loader.normal</span><br></pre></td></tr></table></figure>
+<p>这就符合先进后出的原则。如果某个loader在pitching阶段返回了一个不为undefined的值，那么这个过程就会提前终止，跳过该loader后面的loader。比如上述的b-loader在pitching阶段返回了一个值，那么整个执行过程将会变为：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a-loader.pitch</span><br><span class="line">  b-loader.pitch <span class="keyword">return</span> something</span><br><span class="line">a-loader.normal</span><br></pre></td></tr></table></figure>
+
+<p>在b-loader.pitch中返回的值将会作为a-loader.normal正常的输入。</p>
+<p>所谓的pitching阶段其实就是loader导出的pitch函数。如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span> <span class="title">loaderb</span>(<span class="params">content, map, meta</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'b-loader.normal'</span>, <span class="keyword">this</span>.data); <span class="comment">// &#123; value: 'b-loader.pitch' &#125;</span></span><br><span class="line">  <span class="keyword">return</span> <span class="string">`export default "b-loader"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports.pitch = <span class="function"><span class="keyword">function</span>(<span class="params">remainingRequest, precedingRequest, data</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'b-loader.pitch'</span>, remainingRequest,<span class="string">'---'</span>, precedingRequest, <span class="string">'---'</span>, data)</span><br><span class="line">  data.value = <span class="string">'b-loader.pitch'</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 返回不为undefined的值</span></span><br><span class="line">  <span class="keyword">return</span> <span class="string">''</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以同一个loader，如果有了pitch函数，那么它的default导出的函数是不会执行的。</p>
+<p>上面可以看出，pitch函数的签名了。</p>
+<ul>
+<li>remainingRequest：字符串。剩余loader路径 + 待处理的文件路径</li>
+<li>precedingRequest：字符串。已经处理过的loader的路径</li>
+<li>data：可以在pitch以及normal阶段传递数据</li>
+</ul>
+<p>以上述的a-loader、b-loader、c-loader为例。对同一个资源文件进行处理，打印出的结果如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a-loader.pitch /absolutePath/loader-b.js!<span class="regexp">/absolutePath/</span>loader-c.js!<span class="regexp">/absolutePath/</span>src/test.txt ---  --- &#123;&#125;</span><br><span class="line">b-loader.pitch /absolutePath/loader-c.js!<span class="regexp">/absolutePath/</span>src/test.txt --- <span class="regexp">/absolutePath/</span>loader-a.js --- &#123;&#125;</span><br><span class="line">c-loader.pitch /absolutePath/test.txt --- <span class="regexp">/absolutePath/</span>loader-a.js!<span class="regexp">/absolutePath/</span>loader-b.js --- &#123;&#125;</span><br><span class="line"></span><br><span class="line">c-loader.normal &#123; value: <span class="string">'c-loader.pitch'</span> &#125;</span><br><span class="line">b-loader.normal &#123; value: <span class="string">'b-loader.pitch'</span> &#125;</span><br><span class="line">a-loader.normal &#123; value: <span class="string">'a-loader.pitch'</span> &#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="bundle-loader"><a href="#bundle-loader" class="headerlink" title="bundle-loader"></a>bundle-loader</h3><p>bundle-loader 是使用pitch的一个例子，bundle-loader可以按需加载代码和分隔代码块。该loader是 webpack1 时期的产物，它是使用webpack提供的 require.ensure 函数实现的。在 webpack2 及之后的版本，webpack推荐使用符合规范的 dynamic import 来实现按需加载和提取chunk。它的按需加载部分主要代码如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(query.lazy) &#123;</span><br><span class="line">  <span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">require</span>.ensure([], <span class="function"><span class="keyword">function</span>(<span class="params"><span class="built_in">require</span></span>) </span>&#123;</span><br><span class="line">      cb(<span class="built_in">require</span>(loaderUtils.stringifyRequest(<span class="keyword">this</span>, <span class="string">'!!'</span> + remainingRequest)))</span><br><span class="line">    &#125;, chunkName)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用方式如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> LazyReactDom <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> Counter = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;div&gt;counter&lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">  )</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">LazyReactDom(ReactDOM =&gt; &#123;</span></span><br><span class="line"><span class="regexp">  ReactDOM.render(&lt;Counter /</span>&gt;, <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>))</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://store-g1.seewo.com/135b05a2117f4ecea60e44633504b22a" alt=""></p>
+<p>可以看到，react-dom确实被分割成了一个chunk。在这里的webpack配置中，对react-dom使用了多个配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  test: &#x2F;react-dom&#x2F;,</span><br><span class="line">  use: [</span><br><span class="line">    &#x2F;&#x2F; &#39;raw-loader&#39;,</span><br><span class="line">    &#123;</span><br><span class="line">      loader: &#39;bundle-loader&#39;,</span><br><span class="line">      options: &#123;</span><br><span class="line">        lazy: true,</span><br><span class="line">        name: &#39;ReactDoms&#39;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    path.resolve(__dirname, &#39;.&#x2F;loader&#x2F;loader-a.js&#39;),</span><br><span class="line">    path.resolve(__dirname, &#39;.&#x2F;loader&#x2F;loader-b.js&#39;),</span><br><span class="line">    path.resolve(__dirname, &#39;.&#x2F;loader&#x2F;loader-c.js&#39;),</span><br><span class="line">  ]</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<p>打印出 <code>loaderUtils.stringifyRequest(this, &#39;!!&#39; + remainingRequest</code> 的值是<br><code>&quot;!!../../loader/loader-a.js!../../loader/loader-b.js!../../loader/loader-c.js!./index.js&quot;</code>。<br>所以这就很好的解释了一个问题，尽管由于bundle-loader使用了pitch，导致跳过了abc loader的pitch方法，但是当bundle-loader执行的时候，它的remainingRequest仍然是有abc这三个loader的，它们同样也会被执行。</p>
+<h3 id="style-loader"><a href="#style-loader" class="headerlink" title="style-loader"></a>style-loader</h3><p>同样，style-loader也是pitch的一个应用场景。它的作用是插入css到dom中，一般在开发环境使用。可能会这样配置style-loader:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">  use: [</span><br><span class="line">    <span class="string">'style-loader'</span>,</span><br><span class="line">    <span class="string">'css-loader'</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>style-loader 同样使用了pitch方法。它的执行的时候，调用css-loader，处理好css中的@import和url()后，得到css文件。再根据配置项决定如何将css插入到dom中。</p>
+<h2 id="loader上下文"><a href="#loader上下文" class="headerlink" title="loader上下文"></a>loader上下文</h2><p>loader上下文表示在loader内部使用 this 可以访问的一些方法和属性。在上文中，已经使用过 <code>this.callback</code>、 <code>this.async()</code>、<code>this.data</code>、<code>this.resourcePath</code>等。</p>
+<p>loader上下文包含非常多的信息以便我们操作：</p>
+<p>loader相关：this.loaders、this.loaderIndex、 this.query、 this.data、 this.callback、 this.async<br>资源文件相关：this.request、this.resource、this.resourcePath、this.resourceQuery<br>输出到控制台：this.emitError、this.emitWarning<br>操作其他文件：this.loadModule、 this.resolve、 this.addDependency、 this.addContextDependency、 this.clearDependencies、 this.emitFile<br>上下文信息：this.rootContext、 this.context<br>其他：this.fs、 this.sourceMap、 this.webpack、 this.target、 this.cacheable、 this.version</p>
+<h3 id="this-loadModule"><a href="#this-loadModule" class="headerlink" title="this.loadModule"></a>this.loadModule</h3><p>假设项目中有一些公共函数（globalUtil），期望每个js文件中都可以使用这些函数，我们可以在每个js文件中去引入这个util，也可以通过loader来注入。</p>
+<p>loader配置如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  test: <span class="regexp">/\.jsx?$/</span>,</span><br><span class="line">  exclude: <span class="regexp">/node_modules/</span>,</span><br><span class="line">  use: [</span><br><span class="line">    &#123;</span><br><span class="line">      loader: <span class="string">'babel-loader'</span>,</span><br><span class="line">      options: &#123;</span><br><span class="line">        <span class="string">'cacheDirectory'</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      loader: path.join(__dirname, <span class="string">'./src/util-loader'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对每个js(x)类型的文件应用util-loader。util-loader.js的内容如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span> (<span class="params">content, map, meta</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 需要异步加载文件，所以使用this.async</span></span><br><span class="line">  <span class="keyword">const</span> callback = <span class="keyword">this</span>.async();</span><br><span class="line">  <span class="comment">// source是./util的内容</span></span><br><span class="line">  <span class="keyword">this</span>.loadModule(<span class="string">'./util'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">err, source, sourceMap, <span class="built_in">module</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> utilContent = <span class="string">`const globalUtil = <span class="subst">$&#123;source.split(<span class="string">'='</span>)[<span class="number">1</span>]&#125;</span>; <span class="subst">$&#123;content&#125;</span>`</span></span><br><span class="line">    callback(<span class="literal">null</span>, utilContent, sourceMap, meta)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再看下./util的内容，注意：这里util没有后缀，因为如果使用util.js，那么这个js文件还会被这个loader处理，从而陷入了循环。util的内容就是一个工具对象：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  add(a, b) &#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">  &#125;,</span><br><span class="line">  minus(a, b) &#123;</span><br><span class="line">    <span class="keyword">return</span> a - b;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>自定义的loader中给globalUtil赋值的是<code>${source.split(&#39;=&#39;)[1]}</code>，就是module.exports的内容。</p>
+<p>这样的任意的js文件中就可以使用globalUtil了，不需要任何引入。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">const</span> result = globalUtil.add(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'result'</span>, result) <span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="this-emitFile"><a href="#this-emitFile" class="headerlink" title="this.emitFile"></a>this.emitFile</h3><p>这个方法的作用是输出一个文件。<code>emitFile(name: string, content: Buffer|string, sourceMap: {...})</code></p>
+<p>file-loader 就使用了这个函数。file-loader的作用是解析 <code>import/resolve()</code> 引入的文件路径，根据webpack配置，输出一个相同的文件到输出目录。具体代码就不放了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>文章先举例说明了loader的三种用法，然后具体介绍的loader以及它的特性，并通过举出实际的例子来阐述这些特性。最后列出了loader的上下文具有的属性和方法，这些属性和方法可以满足各种各样的loader场景。</p>
+<p>loader就是一个约定格式的函数，它通过解析（为所欲为）各种各样格式的文件，最终输出一个任意的string到源代码。loader是webpack这个工具链中不可或缺的一环。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a href="https://juejin.im/post/5e3389436fb9a02fef3a707a#heading-5" target="_blank" rel="noopener">看完这篇webpack-loader，不再怕面试官问了</a>  </li>
+<li><a href="https://webpack.docschina.org/configuration/module/#rule" target="_blank" rel="noopener">webpack module</a>  </li>
+<li><a href="https://webpack.docschina.org/contribute/writing-a-loader/" target="_blank" rel="noopener">编写一个loader</a>  </li>
+<li><a href="https://webpack.docschina.org/api/loaders" target="_blank" rel="noopener">loader API</a></li>
+<li><a href="https://github.com/webpack-contrib" target="_blank" rel="noopener">各种webpack loader</a></li>
+<li><a href="https://github.com/postcss/postcss-loader" target="_blank" rel="noopener">postcss loader</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/webpack/" rel="tag"># webpack</a>
+              <a href="/tags/loader/" rel="tag"># loader</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/08/ts-contional-types/index/" rel="prev" title="ts 条件类型、infer、协变与逆变">
+      <i class="fa fa-chevron-left"></i> ts 条件类型、infer、协变与逆变
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#loader的用法"><span class="nav-number">1.</span> <span class="nav-text">loader的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置"><span class="nav-number">1.1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内联"><span class="nav-number">1.2.</span> <span class="nav-text">内联</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CLI"><span class="nav-number">1.3.</span> <span class="nav-text">CLI</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#loader是什么"><span class="nav-number">2.</span> <span class="nav-text">loader是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最简单的loader-–-raw-loader"><span class="nav-number">3.</span> <span class="nav-text">最简单的loader – raw-loader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#loader特性"><span class="nav-number">4.</span> <span class="nav-text">loader特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#“Raw”-loader-与-url-loader"><span class="nav-number">5.</span> <span class="nav-text">“Raw” loader 与 url-loader</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#url-loader"><span class="nav-number">5.1.</span> <span class="nav-text">url-loader</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pitching"><span class="nav-number">6.</span> <span class="nav-text">pitching</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#bundle-loader"><span class="nav-number">6.1.</span> <span class="nav-text">bundle-loader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#style-loader"><span class="nav-number">6.2.</span> <span class="nav-text">style-loader</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#loader上下文"><span class="nav-number">7.</span> <span class="nav-text">loader上下文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#this-loadModule"><span class="nav-number">7.1.</span> <span class="nav-text">this.loadModule</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#this-emitFile"><span class="nav-number">7.2.</span> <span class="nav-text">this.emitFile</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">9.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Real"
+      src="/assets/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Real</p>
+  <div class="site-description" itemprop="description">毕业于合肥工业大学。就职于cvte。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yuwanlin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yuwanlin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Real</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '561fdcc2fc7b29e33a3e',
+      clientSecret: 'cfca792daa526d7ee752ff5f5040d41f6bb0af68',
+      repo        : 'yuwanlin.github.io',
+      owner       : 'yuwanlin',
+      admin       : ['yuwanlin'],
+      id          : 'eb3c0761227f517ea6a882fd7021cc75',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

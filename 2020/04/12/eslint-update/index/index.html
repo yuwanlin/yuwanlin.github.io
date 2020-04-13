@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yuwanlin.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="项目近期目录刚好有一波调整，顺便优化了一波eslint的配置，让项目在开发的过程中lint提示更加友好（注：编辑器使用vscode 1.44版本）。 下面记录本次优化过程中的调整以及遇到的一些问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记项目中的一次eslint + tsconfig更新">
+<meta property="og:url" content="https://yuwanlin.github.io/2020/04/12/eslint-update/index/index.html">
+<meta property="og:site_name" content="Real的博客">
+<meta property="og:description" content="项目近期目录刚好有一波调整，顺便优化了一波eslint的配置，让项目在开发的过程中lint提示更加友好（注：编辑器使用vscode 1.44版本）。 下面记录本次优化过程中的调整以及遇到的一些问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://store-g1.seewo.com/36eec6aa2383417bbfe8e975b0efc372">
+<meta property="og:image" content="https://store-g1.seewo.com/42b3df34e26d47b394101b4451c18029">
+<meta property="og:image" content="https://store-g1.seewo.com/bd98b57db6644ec1bc8b9b4bedaf05f8">
+<meta property="og:image" content="https://store-g1.seewo.com/fc1ddc57176a423fae810d85d1531340">
+<meta property="article:published_time" content="2020-04-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-11T16:00:00.000Z">
+<meta property="article:author" content="Real">
+<meta property="article:tag" content="工程化">
+<meta property="article:tag" content="eslint">
+<meta property="article:tag" content="vscode">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://store-g1.seewo.com/36eec6aa2383417bbfe8e975b0efc372">
+
+<link rel="canonical" href="https://yuwanlin.github.io/2020/04/12/eslint-update/index/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>记项目中的一次eslint + tsconfig更新 | Real的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Real的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">生活的理想，是为了理想的生活。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/yuwanlin" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yuwanlin.github.io/2020/04/12/eslint-update/index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/images/avatar.jpg">
+      <meta itemprop="name" content="Real">
+      <meta itemprop="description" content="毕业于合肥工业大学，就职于cvte。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Real的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记项目中的一次eslint + tsconfig更新
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-12 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-12T00:00:00+08:00">2020-04-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>项目近期目录刚好有一波调整，顺便优化了一波eslint的配置，让项目在开发的过程中lint提示更加友好（注：编辑器使用vscode 1.44版本）。</p>
+<p>下面记录本次优化过程中的调整以及遇到的一些问题。</p>
+<a id="more"></a>
+<h2 id="目录调整"><a href="#目录调整" class="headerlink" title="目录调整"></a>目录调整</h2><p>优化之前的目录</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- server</span><br><span class="line">- client</span><br><span class="line">  - tsconfig.json</span><br><span class="line">- .eslintrc.js</span><br><span class="line">- app.js</span><br></pre></td></tr></table></figure>
+<p>app.js是node的启动目录，server是node的一些功能聚合目录，client即前端文件的目录，项目基于react + ts开发的。</p>
+<p>所以 .eslintrc.js 放在最外层可以检查整个项目，tsconfig.json放在client目录，期望可以检查client中的ts、tsx文件，但是实际中并没有生效。下文会说。</p>
+<p>优化之后的目录</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- server</span><br><span class="line">  - app.js</span><br><span class="line">  - .eslintrc.js</span><br><span class="line">- client</span><br><span class="line">  - eslintrc.js</span><br><span class="line">  - tsconfig.json</span><br><span class="line">- .eslintrc.js</span><br></pre></td></tr></table></figure>
+<p>简单的说就是把node端相关的内容全部移到server中去，并且针对不同的端做了一些不同的配置。下面讲讲本次优化过程中的改动。</p>
+<h2 id="调整项"><a href="#调整项" class="headerlink" title="调整项"></a>调整项</h2><h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><p>最外层 .eslintrc.js 是一些全局通用的配置。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="string">"parserOptions"</span>: &#123;</span><br><span class="line">    <span class="string">"ecmaFeatures"</span>: &#123;</span><br><span class="line">      <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="string">"rules"</span>: &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 全局变量如果想不报 "no-undef" 错误，就在这里定义。</span></span><br><span class="line">  <span class="string">"globals"</span>: &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>client 和 server 中.eslintrc.js 添加一些环境相关的配置。它们继承最外层通用的配置文件，并添加一些单独的配置。</p>
+<p>如下server中的配置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  extends: [</span><br><span class="line">    <span class="string">'alloy'</span>,</span><br><span class="line">    <span class="string">'../.eslintrc.js'</span></span><br><span class="line">  ],</span><br><span class="line"></span><br><span class="line">  <span class="string">"env"</span>: &#123;</span><br><span class="line">    <span class="string">"node"</span>: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"parser"</span>: <span class="string">"babel-eslint"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>server端node代码仍然是使用js编写的，所以eslint解析器使用babel-eslint。</p>
+<p>如下client中的配置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="string">"extends"</span>: [</span><br><span class="line">    <span class="string">'alloy'</span>,</span><br><span class="line">    <span class="string">'alloy/typescript'</span>,</span><br><span class="line">    <span class="string">'../.eslintrc.js'</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"parser"</span>: <span class="string">"@typescript-eslint/parser"</span>,</span><br><span class="line">  <span class="string">"rules"</span>: &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="string">"react/jsx-no-bind"</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="string">"@typescript-eslint/interface-name-prefix"</span>: [<span class="string">"warn"</span>, &#123; <span class="string">"prefixWithI"</span>: <span class="string">"always"</span> &#125; ],</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"plugins"</span>: [</span><br><span class="line">    <span class="string">"@typescript-eslint"</span>,</span><br><span class="line">    <span class="string">"react"</span>,</span><br><span class="line">    <span class="string">"react-hooks"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"parserOptions"</span>: &#123;</span><br><span class="line">    <span class="string">"ecmaVersion"</span>: <span class="number">6</span>,</span><br><span class="line">    <span class="string">"sourceType"</span>: <span class="string">"module"</span>,</span><br><span class="line">    <span class="string">"ecmaFeatures"</span>: &#123;</span><br><span class="line">      <span class="string">"jsx"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"project"</span>: <span class="string">"./tsconfig.json"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>client中使用react + ts开发，所以使用 @typescript-eslint/parser 作为eslint的解析器，关于两种parser的区别，下文会讲到。<br>alloy的eslint规则是腾讯开源的，可以参考配置。如果发现alloy的一些配置和自己的项目不符合，可以在rules中禁用相关配置。<br>rules添加一些react以及ts相关的rule。plugins是必须要指定的，否则eslint将会报错。sourceType: module + ecmaVersion: 6 表示解析es6除了模块化相关的所有语法。</p>
+<p>相关的npm包：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">eslint-config-alloy</span><br><span class="line">eslint-<span class="keyword">plugin</span>-react</span><br><span class="line">eslint-<span class="keyword">plugin</span>-react-hooks</span><br><span class="line">@typescript-eslint/eslint-<span class="keyword">plugin</span></span><br></pre></td></tr></table></figure>
+
+<p>extend 提供的是 eslint 现有规则的一系列预设，而 plugin 则提供了除预设之外的自定义规则，当在 eslint 的规则里找不到合适的的时候，就可以借用插件来实现了。</p>
+<h3 id="eslintrc-js-的parser修改"><a href="#eslintrc-js-的parser修改" class="headerlink" title=".eslintrc.js 的parser修改"></a>.eslintrc.js 的parser修改</h3><p>在早期，ts的代码是通过tslint配置的，不过自从2019年1月ts开发团队意识到使用tslint会带来一些麻烦，并且业界已经有了成熟的eslint，就决定不再维护tslint，同时配合eslint来整合tslint那一套。相关文章见<a href="https://eslint.org/blog/2019/01/future-typescript-eslint" target="_blank" rel="noopener">ts在eslint上的未来</a>。</p>
+<p>从上文可以看到，server端和client端的eslint的parser是不同的。原因在于server使用js，而client使用ts。  </p>
+<table>
+<thead>
+<tr>
+<th align="center">parser</th>
+<th align="center">优点</th>
+<th align="center">缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">babel-eslint</td>
+<td align="center">使用babel解析，通过插件可以支持各种语法</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">@typescript-eslint/parser</td>
+<td align="center">使用ts编译器解析，完美支持ts</td>
+</tr>
+</tbody></table>
+<p><strong>babel通过插件定义的一些语法，ts编译器不能识别</strong> 这一部分在开发中是不常见的，比如可选链（?.），控制合并运算符（??）这些，在babel 7.0的时候就可以通过插件支持，而ts 3.7版本才内置。那么在babel 7.0 到 ts3.7这个时间端内，ts不能检测上面两种语法。后来在babel7.7的时候，babel-preset-env内置这两种语法。ts3.7同样支持。相关文章见<a href="https://github.com/typescript-eslint/typescript-eslint" target="_blank" rel="noopener">typescript-eslint
+</a>。</p>
+<p>需要注意的是：即使使用了@typescript-eslint/parser，eslint也不能检查出ts文件中的类型错误，只能检测出语法错误。如下图：<br><img src="https://store-g1.seewo.com/36eec6aa2383417bbfe8e975b0efc372" alt=""><br>控制台中，通过运行eslint命令，检查出了aa这个变量未使用，这是eslint的rule的报错，它并没有报类型错误。将鼠标移到aa上面，之所以能在代码中看到错误提示，是vscode配置typescript检查出来的。如果要检查类型错误，可以通过tsc来检查，–noEmit表示不生成编译后的文件。</p>
+<h2 id="确定eslint的检查范围"><a href="#确定eslint的检查范围" class="headerlink" title="确定eslint的检查范围"></a>确定eslint的检查范围</h2><h3 id="包括哪些文件"><a href="#包括哪些文件" class="headerlink" title="包括哪些文件"></a><a href="https://cn.eslint.org/docs/user-guide/command-line-interface#--ext" target="_blank" rel="noopener">包括哪些文件</a></h3><p>有两种方式来指定eslint的检查范围</p>
+<ol>
+<li><p>一种方式是通过 –ext 来确定eslint的检查范围，如：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eslint ./<span class="class"><span class="keyword">lib</span> --<span class="title">ext</span> .<span class="title">js</span>,.<span class="title">jsx</span>,.<span class="title">ts</span>,.<span class="title">tsx</span></span></span><br></pre></td></tr></table></figure>
+<p>表示将检查lib文件夹下的所有js、jsx、ts、tsx文件。</p>
+</li>
+<li><p>另一种方式通过配置glob语法</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">eslint </span>&#123;js,router,store&#125;<span class="comment">/**/</span>*</span><br></pre></td></tr></table></figure>
+<p>表示将检查js，router，store文件夹下的所有文件。</p>
+</li>
+</ol>
+<p>需要注意的是，当–ext和glob语法一起使用时，将忽略–ext指定的文件。</p>
+<h3 id="排除哪些文件"><a href="#排除哪些文件" class="headerlink" title="排除哪些文件"></a><a href="https://cn.eslint.org/docs/user-guide/configuring#ignoring-files-and-directories" target="_blank" rel="noopener">排除哪些文件</a></h3><p>通过建立一个 .eslintignore 文件来进一步筛选上述包括的文件。.eslintignore 使用glob语法，定义了哪些文件不需要被检查。比如上面的文件夹中有以 .test.js 为后缀的测试文件，它不需要被检查，那么可以配置：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*<span class="strong">*/*</span>.test.js</span><br></pre></td></tr></table></figure>
+
+<h2 id="vscode集成"><a href="#vscode集成" class="headerlink" title="vscode集成"></a><a href="https://github.com/microsoft/vscode-eslint" target="_blank" rel="noopener">vscode集成</a></h2><p>vscode中可以针对eslint做一些单独的配置。配置方式是：首选项 -&gt; 设置 -&gt; 输入eslint。它分为对用户或者对当前工作区配置。<br><img src="https://store-g1.seewo.com/42b3df34e26d47b394101b4451c18029" alt=""></p>
+<p>当前工作区配置相当于在项目根目录下的 .vscode/settings.json 文件配置。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"eslint.lintTask.enable"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">"typescript.tsdk"</span>: <span class="string">"node_modules/typescript/lib"</span>,</span><br><span class="line">  <span class="attr">"eslint.workingDirectories"</span>: [ <span class="string">"./client"</span>, <span class="string">"./server"</span> ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="一些问题记录"><a href="#一些问题记录" class="headerlink" title="一些问题记录"></a>一些问题记录</h2><h3 id="1-vscode中配置了eslint但是却没有生效？"><a href="#1-vscode中配置了eslint但是却没有生效？" class="headerlink" title="1. vscode中配置了eslint但是却没有生效？"></a>1. vscode中配置了eslint但是却没有生效？</h3><ol>
+<li>首先，要在vscode的扩展商店下载 EsLint 扩展，这一步应该是没什么问题的</li>
+<li>更有可能是vscode运行eslint的时候出错了，这时候可以看下调试控制台<br>首选项 -&gt; 设置 -&gt; 搜索eslint。确保eslint是开启的<br><img src="https://store-g1.seewo.com/bd98b57db6644ec1bc8b9b4bedaf05f8" alt=""></li>
+</ol>
+<p>然后如下图查看调试控制台是否有报错<br><img src="https://store-g1.seewo.com/fc1ddc57176a423fae810d85d1531340" alt=""></p>
+<h3 id="2-types-react-redux"><a href="#2-types-react-redux" class="headerlink" title="2. @types/react-redux"></a>2. @types/react-redux</h3><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">'/node_modules/hoist-non-react-statics' has no exported member 'NonReactStatics'.</span></span><br><span class="line"></span><br><span class="line"><span class="symbol">47 </span>import &#123; NonReactStatics &#125; from <span class="comment">'hoist-non-react-statics';</span></span><br></pre></td></tr></table></figure>
+<p>这个<a href="https://github.com/DefinitelyTyped/DefinitelyTyped/issues/33690" target="_blank" rel="noopener">issue</a>提供了多种解决方案：</p>
+<ol>
+<li>降级react-redux版本</li>
+<li>添加hoist-non-react-statics依赖</li>
+<li>tsconfig添加 <code>skipLibCheck: true</code>，表示忽略.d.ts文件的类型检查</li>
+</ol>
+<h3 id="3-ts的lib-dom-d-ts报错，xxx-was-also-declared-here"><a href="#3-ts的lib-dom-d-ts报错，xxx-was-also-declared-here" class="headerlink" title="3. ts的lib.dom.d.ts报错，xxx was also declared here"></a>3. ts的lib.dom.d.ts报错，xxx was also declared here</h3><p>SO上有这个<a href="https://stackoverflow.com/questions/57331779/typescript-duplicate-identifier-iteratorresult" target="_blank" rel="noopener">问题的解决方案</a>，同样，使用 <code>skipLibCheck: true</code> 可以解决这个问题。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本次eslint的配置过程中，对eslint整个结构和体系有了更深的了解。本文主要记录的是eslint相关的，tsconfig相关的内容较少，当然内容也可能不是很全面，比如eslint的overrides语法，eslint自带的解析器estree等。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/" rel="tag"># 工程化</a>
+              <a href="/tags/eslint/" rel="tag"># eslint</a>
+              <a href="/tags/vscode/" rel="tag"># vscode</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/10/webpack-source/index/" rel="prev" title="webpack4源码分析之二 -- 初始化配置">
+      <i class="fa fa-chevron-left"></i> webpack4源码分析之二 -- 初始化配置
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#目录调整"><span class="nav-number">1.</span> <span class="nav-text">目录调整</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调整项"><span class="nav-number">2.</span> <span class="nav-text">调整项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#继承"><span class="nav-number">2.1.</span> <span class="nav-text">继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eslintrc-js-的parser修改"><span class="nav-number">2.2.</span> <span class="nav-text">.eslintrc.js 的parser修改</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#确定eslint的检查范围"><span class="nav-number">3.</span> <span class="nav-text">确定eslint的检查范围</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#包括哪些文件"><span class="nav-number">3.1.</span> <span class="nav-text">包括哪些文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#排除哪些文件"><span class="nav-number">3.2.</span> <span class="nav-text">排除哪些文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vscode集成"><span class="nav-number">4.</span> <span class="nav-text">vscode集成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些问题记录"><span class="nav-number">5.</span> <span class="nav-text">一些问题记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-vscode中配置了eslint但是却没有生效？"><span class="nav-number">5.1.</span> <span class="nav-text">1. vscode中配置了eslint但是却没有生效？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-types-react-redux"><span class="nav-number">5.2.</span> <span class="nav-text">2. @types&#x2F;react-redux</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-ts的lib-dom-d-ts报错，xxx-was-also-declared-here"><span class="nav-number">5.3.</span> <span class="nav-text">3. ts的lib.dom.d.ts报错，xxx was also declared here</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Real"
+      src="/assets/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Real</p>
+  <div class="site-description" itemprop="description">毕业于合肥工业大学，就职于cvte。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yuwanlin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yuwanlin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Real</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '561fdcc2fc7b29e33a3e',
+      clientSecret: 'cfca792daa526d7ee752ff5f5040d41f6bb0af68',
+      repo        : 'yuwanlin.github.io',
+      owner       : 'yuwanlin',
+      admin       : ['yuwanlin'],
+      id          : '99d7f574c9ac817bd21383b86a73f43a',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

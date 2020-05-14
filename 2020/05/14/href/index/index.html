@@ -20,20 +20,22 @@
     var CONFIG = {"hostname":"yuwanlin.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="毕业于合肥工业大学，就职于cvte。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="tags">
-<meta property="og:url" content="https://yuwanlin.github.io/tags/index.html">
+  <meta name="description" content="起因接手的一个老项目中发现一个问题，当从某个页面退出登录的时候，有可能退出失败，即仍然是登录状态。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次a[href&#x3D;&#39;#&#39;]带来的问题">
+<meta property="og:url" content="https://yuwanlin.github.io/2020/05/14/href/index/index.html">
 <meta property="og:site_name" content="Real的博客">
-<meta property="og:description" content="毕业于合肥工业大学，就职于cvte。">
+<meta property="og:description" content="起因接手的一个老项目中发现一个问题，当从某个页面退出登录的时候，有可能退出失败，即仍然是登录状态。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-02-28T17:19:06.000Z">
-<meta property="article:modified_time" content="2020-02-28T17:19:23.423Z">
+<meta property="og:image" content="https://store-g1.seewo.com/fc339686a6d34c75afe7257fc8a5eede">
+<meta property="article:published_time" content="2020-05-14T15:35:07.797Z">
+<meta property="article:modified_time" content="2020-05-14T15:37:00.758Z">
 <meta property="article:author" content="Real">
-<meta property="article:tag" content="前端，typescript，react">
+<meta property="article:tag" content="其他">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://store-g1.seewo.com/fc339686a6d34c75afe7257fc8a5eede">
 
-<link rel="canonical" href="https://yuwanlin.github.io/tags/">
+<link rel="canonical" href="https://yuwanlin.github.io/2020/05/14/href/index/">
 
 
 <script id="page-configurations">
@@ -41,12 +43,11 @@
   CONFIG.page = {
     sidebar: "",
     isHome: false,
-    isPost: false
+    isPost: true
   };
 </script>
 
-  <title>tags | Real的博客
-  </title>
+  <title>一次a[href='#']带来的问题 | Real的博客</title>
   
 
 
@@ -154,52 +155,124 @@
       <div class="main-inner">
         <div class="content-wrap">
           
-  
-  
 
           <div class="content">
             
 
   <div class="posts-expand">
-    
-    
-    
-    <div class="post-block" lang="zh-CN">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yuwanlin.github.io/2020/05/14/href/index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/images/avatar.jpg">
+      <meta itemprop="name" content="Real">
+      <meta itemprop="description" content="毕业于合肥工业大学，就职于cvte。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Real的博客">
+    </span>
       <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一次a[href='#']带来的问题
+        </h1>
 
-<h1 class="post-title" itemprop="name headline">tags
-</h1>
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
 
-<div class="post-meta">
+              <time title="创建时间：2020-05-14 23:35:07 / 修改时间：23:37:00" itemprop="dateCreated datePublished" datetime="2020-05-14T23:35:07+08:00">2020-05-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>接手的一个老项目中发现一个问题，当从某个页面退出登录的时候，有可能退出失败，即仍然是登录状态。</p>
+<a id="more"></a>
+
+<p>A 和 B由webpack打包的两个入口。它们（js文件）被引入的域名如下：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">A:</span> abc.com</span><br><span class="line"><span class="symbol">B:</span> abc.com<span class="meta-keyword">/app/</span><span class="meta">#hash1</span></span><br></pre></td></tr></table></figure>
+<p>A是首页，登录后通过<code>window.location.href</code>跳转到B页面，并且带上hash值。B页面可以点击退出登录按钮后回到首页，并清除登录状态。</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>简化版的流程如下：<br><img src="https://store-g1.seewo.com/fc339686a6d34c75afe7257fc8a5eede" alt=""></p>
+<p>流程上很普通，没有什么问题。</p>
+<ol>
+<li>用户首次打开页面，页面发起登录请求，由于cookie中没有token以及sessionId，node中获取不到用户信息，用户处于未登录状态。</li>
+<li>用户手动登录，node session中保存了用户的信息，并将sessionId以及用户token存入客户端cookie中。</li>
+<li>用户下次打开页面的时候，无需再次手动点击登录，页面自动发送登录请求，携带cookie，node根据sessionId获取到用户信息，再进行接下来的操作。</li>
+<li>用户退出登录时，node中会清除session中该用户的信息，并且响应头中set-cookie字段的值中，token置为空。</li>
+</ol>
+<h2 id="复现"><a href="#复现" class="headerlink" title="复现"></a>复现</h2><p>在B页面hash路由中，a标签是这样写的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">handleLogoutClick()&#123;</span><br><span class="line">  request(<span class="string">'/app/logout'</span>)</span><br><span class="line">  .then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">window</span>.location.href = <span class="string">'/'</span>;</span><br><span class="line">  &#125;, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;a href=<span class="string">'#'</span> onClick=&#123; <span class="keyword">this</span>.handleLogoutClick &#125;&gt;&#123; Lang.LOGOUT &#125;&lt;<span class="regexp">/a&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>关键就在于<code>href=&#39;#&#39;</code>导致了问题，这里a标签点击的时候实际上有两个操作：</p>
+<ul>
+<li><p>href=’#’<br>在jquery的年代，给a标签href=’#’是一个很正常的，表示点击它什么都不做。然而在使用了现代框架并配置hash路由功能的情况下（不少项目仍然是配置hash路由的），它表示回退到根路由，即<code>abc.com/app/#</code>。</p>
+</li>
+<li><p>触发handleLogoutClick事件<br>logout事件中，会删除掉用户session中的信息，并且响应头中set-cookie字段中token会置为空，这样用户就是登出状态。</p>
+</li>
+</ul>
+<p>问题在于第一个操作中，回到根路由，页面会立马发送请求去拉取一些初始化数据。此时请求状态如下：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 根路由X请求</span><br><span class="line"><span class="number">2.</span> /app/logout</span><br></pre></td></tr></table></figure>
+
+<p>在X请求的时候，/app/logout还没有执行完毕，所以这两个请求存在并发情况，根据请求完成先后的不同会导致不同的结果。</p>
+<p><strong>1. 根路由X请求先完成，logout后完成</strong><br>X请求完成后，设置token到cookie；然后logout请求完成后，node清除用户session信息，响应头设置cookie中的token为空。即这时候用户cookie中没有token，回到根页面<code>location.href=&#39;/&#39;</code>后，走上述登录流程的第一步，登录失败，处于未登录状态。此时是符合预期的。</p>
+<p><strong>2. logout先完成，根路由X请求后完成</strong><br>logout请求完成后清除了用户信息，然而当X请求完成后还会写用户信息到cookie。然后回到根页面，此时cookie中是有用户信息的，会走到上述登录流程的第三部，登录成功，此时仍然是登录状态。</p>
+<p>给用户的感觉就是点击了退出登录按钮，但是仍然是登录状态。这种情况是不符合预期的。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>解决方法很简单，就是去除<code>href=&#39;#&#39;</code>属性。在使用了hash路由的情况下，这种原始操作还是要慎用，优先通过路由API该改变hash值，这样比较统一。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%85%B6%E4%BB%96/" rel="tag"># 其他</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/12/eslint-update/index/" rel="prev" title="记项目中的一次eslint + tsconfig更新">
+      <i class="fa fa-chevron-left"></i> 记项目中的一次eslint + tsconfig更新
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-              目前共计 10 个标签
-            </div>
-            <div class="tag-cloud-tags">
-              <a href="/tags/React/" style="font-size: 12px; color: #ccc">React</a> <a href="/tags/eslint/" style="font-size: 12px; color: #ccc">eslint</a> <a href="/tags/loader/" style="font-size: 12px; color: #ccc">loader</a> <a href="/tags/typescript/" style="font-size: 30px; color: #111">typescript</a> <a href="/tags/vscode/" style="font-size: 12px; color: #ccc">vscode</a> <a href="/tags/webpack/" style="font-size: 30px; color: #111">webpack</a> <a href="/tags/%E5%85%B6%E4%BB%96/" style="font-size: 12px; color: #ccc">其他</a> <a href="/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/" style="font-size: 30px; color: #111">工程化</a> <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" style="font-size: 12px; color: #ccc">源码解析</a> <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 12px; color: #ccc">设计模式</a>
-            </div>
-          </div>
-        
-      </div>
-      
-      
-      
-    </div>
-    
-
-    
-    
-    
   </div>
 
 
@@ -252,6 +325,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#起因"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流程"><span class="nav-number">2.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复现"><span class="nav-number">3.</span> <span class="nav-text">复现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决"><span class="nav-number">4.</span> <span class="nav-text">解决</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -384,7 +458,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'yuwanlin.github.io',
       owner       : 'yuwanlin',
       admin       : ['yuwanlin'],
-      id          : 'f47af1d1eda4d807b02bba32be15120b',
+      id          : '62a1b9abc459cf96896148bffc118238',
         language: 'zh-CN',
       distractionFreeMode: true
     });

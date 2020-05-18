@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yuwanlin.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="背景近期项目中要接入elastic apm，kibana作为数据展示平台。kibana上可以看到请求链路以及耗时，以及上报的错误信息。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sourcemap引起的项目打包方案修改（移除gulp）">
+<meta property="og:url" content="https://yuwanlin.github.io/2020/05/18/webpack-remove-gulp/index/index.html">
+<meta property="og:site_name" content="Real的博客">
+<meta property="og:description" content="背景近期项目中要接入elastic apm，kibana作为数据展示平台。kibana上可以看到请求链路以及耗时，以及上报的错误信息。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://store-g1.seewo.com/7c0734b1c3f44827a65d5a0bd97cd760">
+<meta property="og:image" content="https://store-g1.seewo.com/6a3a4540ba144dfa8c74d2d0b363c5d5">
+<meta property="og:image" content="https://store-g1.seewo.com/18bdab39d25f49fc91a1911a75907d89">
+<meta property="article:published_time" content="2020-05-18T14:33:32.155Z">
+<meta property="article:modified_time" content="2020-05-18T16:08:43.354Z">
+<meta property="article:author" content="Real">
+<meta property="article:tag" content="前端，typescript，react">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://store-g1.seewo.com/7c0734b1c3f44827a65d5a0bd97cd760">
+
+<link rel="canonical" href="https://yuwanlin.github.io/2020/05/18/webpack-remove-gulp/index/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>sourcemap引起的项目打包方案修改（移除gulp） | Real的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Real的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">生活的理想，是为了理想的生活。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/yuwanlin" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yuwanlin.github.io/2020/05/18/webpack-remove-gulp/index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/images/avatar2.jpeg">
+      <meta itemprop="name" content="Real">
+      <meta itemprop="description" content="毕业于合肥工业大学，就职于cvte。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Real的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sourcemap引起的项目打包方案修改（移除gulp）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-18 22:33:32" itemprop="dateCreated datePublished" datetime="2020-05-18T22:33:32+08:00">2020-05-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-19 00:08:43" itemprop="dateModified" datetime="2020-05-19T00:08:43+08:00">2020-05-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>近期项目中要接入<a href="https://www.elastic.co/guide/en/apm/agent/rum-js/current/intro.html" target="_blank" rel="noopener">elastic apm</a>，kibana作为数据展示平台。<br>kibana上可以看到请求链路以及耗时，以及上报的错误信息。</p>
+<a id="more"></a>
+
+<p>关于错误信息这块，为了更方便定位生产环境的错误位置，需要上传sourcemap到kibana。</p>
+<p>没有sourcemap：<br><img src='https://store-g1.seewo.com/7c0734b1c3f44827a65d5a0bd97cd760' width='500' /></p>
+<p>有sourcemap：<br><img src='https://store-g1.seewo.com/6a3a4540ba144dfa8c74d2d0b363c5d5' width='500' /></p>
+<p>OK，sourcemap不是本文的重点。这个项目是个老项目了，该项目打包机制用了gulp + webpack。webpack中output如下配置：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">output</span>: &#123;</span><br><span class="line">  <span class="attribute">path</span>: path.<span class="built_in">join</span>(OutputPath, <span class="string">'statics'</span>),</span><br><span class="line">  filename: <span class="string">'[name].js'</span>,</span><br><span class="line">  chunkFilename: <span class="string">'appchunks/[name].[chunkhash:8].chunk.js'</span>,</span><br><span class="line">  publicPath: <span class="string">'/statics/'</span>,</span><br><span class="line">  sourceMapFilename : <span class="string">'sourcemap/app/[file].map'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>简单地说，对于入口chunk，输出的文件并没有加hash值，而对于动态chunk（import()/react-loadable）等，输出的chunk是被hash处理过的。</p>
+<p>为什么要这样处理呢？这个项目用的是ejs模板引擎，node中render某个模板文件，模板文件中引入webpack输出的文件。如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// node controller</span></span><br><span class="line">res.render(<span class="string">'master.html'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// master.html</span></span><br><span class="line">&lt;!doctype&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line"></span><br><span class="line">&lt;script src=<span class="string">'/statics/main.js'</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">&lt;<span class="regexp">/html&gt;</span></span><br></pre></td></tr></table></figure>
+<p>main.js 是webpack入口chunk打包输出的文件。js打包完成后，gulp将模板文件由source目录移动到modules/views目录。打包完成后目录如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">modules</span></span><br><span class="line"><span class="selector-tag">-</span> <span class="selector-tag">views</span></span><br><span class="line"> <span class="selector-tag">-</span> <span class="selector-tag">master</span><span class="selector-class">.html</span></span><br><span class="line"><span class="selector-tag">statics</span></span><br><span class="line"><span class="selector-tag">-</span> <span class="selector-tag">main</span><span class="selector-class">.js</span></span><br><span class="line"><span class="selector-tag">-</span> <span class="selector-tag">appchunks</span></span><br><span class="line">    <span class="selector-tag">-</span> <span class="selector-attr">[name]</span><span class="selector-class">.xxxxx</span><span class="selector-class">.chunk</span><span class="selector-class">.js</span></span><br><span class="line">    </span><br><span class="line"><span class="selector-tag">src</span></span><br><span class="line"><span class="selector-tag">-</span> <span class="selector-tag">main</span><span class="selector-class">.js</span></span><br><span class="line"><span class="selector-tag">-</span> <span class="selector-tag">views</span></span><br><span class="line">    <span class="selector-tag">-</span> <span class="selector-tag">master</span><span class="selector-class">.html</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>开发环境：</strong><br>不对main.js进行hash，master.html中代码不用修改。node中render master.html模板文件不会报错，项目可以正常使用。</p>
+<p><strong>生产环境：</strong>  </p>
+<ol>
+<li><p>对于main.js，gulp进行 <a href="https://github.com/sindresorhus/gulp-rev#readme" target="_blank" rel="noopener">glup-rev</a> 处理，对main.js加上hash。<code>main.js -&gt; main.xxxhash.js</code>。</p>
+</li>
+<li><p>对html文件进行 <a href="https://github.com/shonny-ua/gulp-rev-collector" target="_blank" rel="noopener">gulp-rev-collector</a> 处理，替换html中的静态资源路径。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// master.html</span><br><span class="line"><span class="meta">&lt;!doctype&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'/statics/main.xxxhash.js'</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>由于是老项目，以前都是这么干的，没有什么问题。</p>
+<p>因为现在要接入apm，要给文件加上sourcemap。对于动态chunk文件，即appchunks下的文件，生成的chunk.js和chunk.js.map的hash值是对应的。但是对于入口chunk，webpack打包生成的bundle是没有hash的。这时候会生成两个文件，<code>main.js</code>和<code>main.js.map</code>。然后gulp-rev对这两文件加上hash，这时候问题就来了，它们两文件的hash是不对应的，就会产生这样一个结果：<br><img src="https://store-g1.seewo.com/18bdab39d25f49fc91a1911a75907d89" alt=""></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">statics</span><br><span class="line">- main<span class="selector-class">.hash1</span>.js</span><br><span class="line">- sourcemap</span><br><span class="line">    - app</span><br><span class="line">        - appchunks</span><br><span class="line">            - [name]<span class="selector-class">.xxxx</span><span class="selector-class">.chunk</span><span class="selector-class">.js</span>.map</span><br><span class="line">        - main<span class="selector-class">.hash2</span><span class="selector-class">.js</span>.map</span><br><span class="line"></span><br><span class="line"><span class="comment">// main.hash1.js 文件尾部：</span></span><br><span class="line"><span class="comment">//# sourceMappingURL=main.hash2.js.map</span></span><br></pre></td></tr></table></figure>
+<p>在本地，如果main.hash1.js出错，通过sourcemap可以找到对应sourcemap文件。到这都是没问题的。</p>
+<p>然而sourcemap文件以及对应的js文件需要通过脚本上传到kibana。由于statics下面除了main.js之外还有其他很多的js文件，所以不能将所有js都上传到kibana。</p>
+<p>上传脚本执行时，会遍历sourcemap/app中的sourcemap文件，然后在statics中找到同名的js文件。这个时候，由于main.hash1.js的sourcemap文件名是main.hash2.js.map，所以在statics中找不到对应的js文件。</p>
+<p>背景就是这样，就是为了解决js文件和对应的sourcemap文件不同名的问题。不同名的原因是gulp对文件hash的，所以如果对入口chunk也通过webpack hash就可以了，这样生成的sourcemap文件的hash和chunk的hash是一样的。</p>
+<p>关键就是这个过程，涉及的修改点挺多的。</p>
+<h2 id="统一hash"><a href="#统一hash" class="headerlink" title="统一hash"></a>统一hash</h2><p>由于gulp-rev对js文件及其对应sourcemap文件处理的hash不同，所以使用webpack来对入口chunk进行hash，所以webpack配置修改为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">output: &#123;</span><br><span class="line">  path: path.join(OutputPath, <span class="string">'statics'</span>),</span><br><span class="line">  filename: <span class="string">'[name].[contenthash:8].js'</span>,</span><br><span class="line">  chunkFilename: <span class="string">'appchunks/app/[name].[contenthash:8].chunk.js'</span>,</span><br><span class="line">  publicPath: <span class="string">'/statics/'</span>,</span><br><span class="line">  sourceMapFilename : <span class="string">'sourcemap/app/[file].map'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改了filename的值，并且移除gulp中对入口chunk进行hash的逻辑。这样的话，webpack打包后的文件输出：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">statics</span></span><br><span class="line"><span class="selector-tag">-</span> <span class="selector-tag">main</span><span class="selector-class">.hash1</span><span class="selector-class">.js</span></span><br><span class="line"><span class="selector-tag">-</span> <span class="selector-tag">sourcemap</span></span><br><span class="line">  <span class="selector-tag">-</span> <span class="selector-tag">app</span></span><br><span class="line">    <span class="selector-tag">-</span> <span class="selector-tag">main</span><span class="selector-class">.hash1</span><span class="selector-class">.js</span></span><br></pre></td></tr></table></figure>
+<p>入口chunk及其sourcemap的hash值是一致的。</p>
+<p>在这种情况下，输出的bundle（即main.hash1.js）被hash了，这时候master.html引用的js资源仍然是main.js（因为没有gulp-rev-collector进行静态资源替换了）。所以需要使用<a href="https://github.com/jantimon/html-webpack-plugin" target="_blank" rel="noopener">html-webpack-plugin</a>来动态将输出的bundle插入到html文件中。</p>
+<h3 id="html-webpack-plugin处理"><a href="#html-webpack-plugin处理" class="headerlink" title="html-webpack-plugin处理"></a>html-webpack-plugin处理</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">  template: <span class="string">'!!raw-loader!'</span> + path.join(SourcePath, <span class="string">'views/master.html'</span>),</span><br><span class="line">  filename: path.join(RootPath, <span class="string">'modules/views/master.html'</span>)</span><br><span class="line">&#125;),</span><br></pre></td></tr></table></figure>
+
+<p>master.html使用 <a href="https://github.com/webpack-contrib/raw-loader" target="_blank" rel="noopener">raw-loader</a> 进行处理，因为master.html中有一些ejs变量，这些变量的值是从node中传过来的，所以不希望html-webpack-plugin对ejs语法进行处理。</p>
+<p><strong>在生产环境下</strong>，html-webpack-plugin会在modules/views下生成master.html文件，node在render模板文件的时候，可以找到它，是可以正常工作的。<br><strong>唯一需要注意的一点是：</strong> 因为master.html中本来已经引用了main.js，所以打包后master.html文件会引用两个main.js文件，一个未hash的，一个已经hash的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// master.html</span></span><br><span class="line">&lt;!doctype&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line"></span><br><span class="line">&lt;script src=<span class="string">'/statics/main.js'</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">&lt;script src=<span class="string">'/statics/main.xxxhash.js'</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line">&lt;<span class="regexp">/html&gt;</span></span><br></pre></td></tr></table></figure>
+<p>由于html文件使用了ejs模板，所以可以设置只在开发环境下渲染未hash的main.js文件。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">%</span> <span class="attr">if</span>(开发环境) &#123; %&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span> <span class="attr">src</span>=<span class="string">"/statics/main.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">%</span> &#125; %&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>开发环境下（开发环境配置是不对资源进行hash的）</strong>，使用了webpack-dev-server，打包后输出的资源不会输出到文件夹。所以node中render master.html模板文件的时候会找不到，所以需要在开发环境打包的时候将html文件写入到文件夹。通过<a href="https://github.com/jantimon/html-webpack-harddisk-plugin" target="_blank" rel="noopener">html-webpack-harddisk-plugin</a>实现。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">plugins: [</span><br><span class="line">  <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">    template: <span class="string">'!!raw-loader!'</span> + path.join(SourcePath, <span class="string">'views/master.html'</span>),</span><br><span class="line">    filename: path.join(RootPath, <span class="string">'modules/views/master.html'</span>),</span><br><span class="line">    alwaysWriteToDisk: <span class="literal">true</span></span><br><span class="line">  &#125;),</span><br><span class="line">  <span class="keyword">new</span> HtmlWebpackHarddiskPlugin()</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>针对单个入口的webpack打包，这样处理是OK的。</p>
+<h2 id="多入口打包"><a href="#多入口打包" class="headerlink" title="多入口打包"></a>多入口打包</h2><p>实际上，我们的项目是多入口的。由于历史原因，生产环境针对每个入口都使用一个webpack配置文件打包。而开发环境下，是会对多入口都进行打包的。所以生产环境如上配置没问题。</p>
+<p>开发环境下，上文描述的只有main.js一个入口，实际上还有site.js这个入口。webpack入口配置：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">entry: &#123;</span><br><span class="line">  main: path.join(__dirname, <span class="string">'xxx-main.js'</span>),</span><br><span class="line">  site: path.join(__dirname, <span class="string">'xxx-site.js'</span>),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果继续按照上述配置，html-webpack-plugin输出的master.html中会有三个js引用：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'/statics/main.js'</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span>（master.html自带的）</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'/statics/main.js'</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span>（html-webpack-plugin追加的）</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'/statics/site.js'</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span>（html-webpack-plugin追加的）</span><br></pre></td></tr></table></figure>
+<p>这样当打开master.html对应的页面的时候，出错倒是不会出错，但是会重复加载main.js以及一个多余的site.js文件（其实开发环境也影响不大），只是看起来不是很舒服。所以开发环境如果是多入口打包，使用html-webpack-plugin会在master.html注入多个js文件引用，这样不太合适，自然就不能使用html-webpack-plugin插件了。需要找其他方法。</p>
+<p>由于master.html中原本已经引用了main.js，所以想到，在开发环境下，master.html实际上不需要额外处理，只要保证node中render能找到就行。所以，简单的，直接将master.html复制一份到modules/views下即可。同时，由于开发环境下去除了html-webpack-plugin，自然html-webpack-harddisk-plugin也不会生效，需要使用 <a href="https://github.com/webpack-contrib/copy-webpack-plugin" target="_blank" rel="noopener">copy-webpack-plugin</a> 配合 <a href="https://github.com/gajus/write-file-webpack-plugin" target="_blank" rel="noopener">write-file-webpack-plugin</a> 将资源输出到文件夹。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> WriteFilePlugin(&#123;</span><br><span class="line">  test: <span class="regexp">/\.html$/</span>,</span><br><span class="line">  useHashIndex: <span class="literal">true</span></span><br><span class="line">&#125;),</span><br><span class="line"><span class="keyword">new</span> CopyPlugin([</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">from</span>: path.join(SourcePath, <span class="string">'views/master.html'</span>),</span><br><span class="line">    to: path.join(RootPath, <span class="string">'modules/views/master.html'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">])</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>由于历史原因，项目使用gulp + webpack打包。在webpack输出sourcemap的情况下，使用gulp添加hash会导致chunk和chunk对应的sourcemap文件的hash值不一致。所以hash值只能统一使用webpack处理。html-webpack-plugin在生产环境下可以正常工作，但是由于我们项目的开发环境是多入口打包，它会带来其他一些问题。所以针对开发环境和生产环境不同配置，给出不同的html文件处理方案，让最终的处理结果在开发环境和生产环境都可以正常工作。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/14/href/index/" rel="prev" title="一次a[href='#']带来的问题">
+      <i class="fa fa-chevron-left"></i> 一次a[href='#']带来的问题
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#统一hash"><span class="nav-number">2.</span> <span class="nav-text">统一hash</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#html-webpack-plugin处理"><span class="nav-number">2.1.</span> <span class="nav-text">html-webpack-plugin处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多入口打包"><span class="nav-number">3.</span> <span class="nav-text">多入口打包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Real"
+      src="/assets/images/avatar2.jpeg">
+  <p class="site-author-name" itemprop="name">Real</p>
+  <div class="site-description" itemprop="description">毕业于合肥工业大学，就职于cvte。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yuwanlin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yuwanlin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Real</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '561fdcc2fc7b29e33a3e',
+      clientSecret: 'cfca792daa526d7ee752ff5f5040d41f6bb0af68',
+      repo        : 'yuwanlin.github.io',
+      owner       : 'yuwanlin',
+      admin       : ['yuwanlin'],
+      id          : '8108609b837917ff20f96fa4d660beaa',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

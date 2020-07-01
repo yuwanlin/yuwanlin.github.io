@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yuwanlin.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言在多人协作的项目开发过程中，如果commit message没有统一规范，会让他人不容易理解，而且自己在以后回顾的时候可能也会忘掉当时做了什么。 commitlint 配合 husky 可以在git commit的时候检查commit message，不符合规范的提交会被拒绝。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用commitlint规范代码提交">
+<meta property="og:url" content="https://yuwanlin.github.io/2020/07/01/commitlint/index/index.html">
+<meta property="og:site_name" content="Real的博客">
+<meta property="og:description" content="前言在多人协作的项目开发过程中，如果commit message没有统一规范，会让他人不容易理解，而且自己在以后回顾的时候可能也会忘掉当时做了什么。 commitlint 配合 husky 可以在git commit的时候检查commit message，不符合规范的提交会被拒绝。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://store-g1.seewo.com/b749c0c2cde74c2a8395ce40afb4ed51">
+<meta property="og:image" content="https://store-g1.seewo.com/ea995b70a3bd4ab197aa0008357dbfe2">
+<meta property="article:published_time" content="2020-07-01T14:57:57.836Z">
+<meta property="article:modified_time" content="2020-07-01T15:02:26.535Z">
+<meta property="article:author" content="Real">
+<meta property="article:tag" content="commitlint">
+<meta property="article:tag" content="代码规范">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://store-g1.seewo.com/b749c0c2cde74c2a8395ce40afb4ed51">
+
+<link rel="canonical" href="https://yuwanlin.github.io/2020/07/01/commitlint/index/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>使用commitlint规范代码提交 | Real的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Real的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">生活的理想，是为了理想的生活。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/yuwanlin" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yuwanlin.github.io/2020/07/01/commitlint/index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/images/avatar2.jpeg">
+      <meta itemprop="name" content="Real">
+      <meta itemprop="description" content="毕业于合肥工业大学，就职于cvte。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Real的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用commitlint规范代码提交
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-07-01 22:57:57 / 修改时间：23:02:26" itemprop="dateCreated datePublished" datetime="2020-07-01T22:57:57+08:00">2020-07-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在多人协作的项目开发过程中，如果commit message没有统一规范，会让他人不容易理解，而且自己在以后回顾的时候可能也会忘掉当时做了什么。</p>
+<p><a href="https://github.com/conventional-changelog/commitlint" target="_blank" rel="noopener">commitlint</a> 配合 <a href="https://github.com/typicode/husky" target="_blank" rel="noopener">husky</a> 可以在<code>git commit</code>的时候检查commit message，不符合规范的提交会被拒绝。</p>
+<a id="more"></a>
+
+<p>husky本质上是使用git的hooks，可以在git commit、push、update等<a href="https://github.com/typicode/husky/blob/master/src/upgrader/index.ts" target="_blank" rel="noopener">前后阶段</a>运行一些命令。</p>
+<p>commitlint是在git <code>commit-msg</code> hook阶段对commit message进行检查。</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// package.json</span></span><br><span class="line"><span class="string">"husky"</span>: &#123;</span><br><span class="line">  <span class="string">"hooks"</span>: &#123;</span><br><span class="line">    <span class="string">"commit-msg"</span>: <span class="string">"commitlint -E HUSKY_GIT_PARAMS"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="代码提交"><a href="#代码提交" class="headerlink" title="代码提交"></a>代码提交</h2><p>在github很多开源项目上，可以看到commit message都是类似如下形式：</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span>(scope?): subject</span><br></pre></td></tr></table></figure>
+<p>有三个字段，type表示本次提交的类型，scope表示本次提交的作用范围（它是可选的，也可以有多个），subject就是具体的提交信息，如：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">chore: run tests on travis ci</span><br><span class="line"><span class="function"><span class="title">fix</span><span class="params">(server)</span></span>: send cors headers</span><br><span class="line"><span class="function"><span class="title">feat</span><span class="params">(blog)</span></span>: add comment section</span><br></pre></td></tr></table></figure>
+
+<p>这些格式都是统一的，为了防止其他的误提交，可以通过commitlint强制进行检查。根据项目的不同，可以自定义配置我们的代码提交信息规范。</p>
+<h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yarn <span class="keyword">add</span> @commitlint/<span class="keyword">cli</span> -D</span><br><span class="line">或者</span><br><span class="line">npm install --save-dev @commitlint/<span class="keyword">cli</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="配置commitlint"><a href="#配置commitlint" class="headerlink" title="配置commitlint"></a>配置commitlint</h3><ol>
+<li>在项目根目录husky.rc或者package.json中添加下列代码：<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"husky"</span>: &#123;</span><br><span class="line">    <span class="attr">"hooks"</span>: &#123;</span><br><span class="line">      <span class="attr">"commit-msg"</span>: <span class="string">"commitlint -E HUSKY_GIT_PARAMS"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<code>-E</code> 参数在commitlint内部表示环境值。</li>
+</ol>
+<ol start="2">
+<li>项目根目录建立<code>commitlint.config.js</code>文件，内容如下：<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span>.exports = &#123;</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">'@commitlint/config-conventional'</span>]</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<code>@commitlint/config-conventional</code>（使用前先安装） 是官方的一个配置，配置文件中使用extends继承，这和eslint的extends是一样的。</li>
+</ol>
+<h3 id="检测配置"><a href="#检测配置" class="headerlink" title="检测配置"></a>检测配置</h3><p>在项目根目录，运行:</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 'fix(server): send cors headers' <span class="string">| npx commitlint</span></span><br></pre></td></tr></table></figure>
+<p>会发现没有任何内容输出，表示没有报错。将<code>fix</code>修改为<code>fi</code>，出现报错:<br><img src="https://store-g1.seewo.com/b749c0c2cde74c2a8395ce40afb4ed51" alt=""><br>说明配置是生效的。</p>
+<p><code>npx</code> 表示只在本次命令中安装commitlint，如果不想每次都安装，可以全局安装commitlint，然后：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 'fix(server): send cors headers' <span class="string">| commitlint</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="配置自己的commitlint"><a href="#配置自己的commitlint" class="headerlink" title="配置自己的commitlint"></a>配置自己的commitlint</h2><p>github上有一些开源的包用于配置commitlint。但是我们自己的项目会有自己的规范，这时候需要定制commitlint。</p>
+<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// commitlint.config.js</span></span><br><span class="line"><span class="keyword">module</span>.exports = &#123;</span><br><span class="line">  <span class="keyword">extends</span>: [<span class="string">'./commitlint/index.js'</span>]</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>./commitlint/index.js</code>内容如下：</p>
+<figure class="highlight sml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">module.exports = &#123;</span><br><span class="line">  parserPreset: <span class="string">'./parser-preset.js'</span>,</span><br><span class="line">  rules: &#123;</span><br><span class="line">    <span class="symbol">'header</span>-max-length': [<span class="number">2</span>, <span class="symbol">'always'</span>, <span class="number">144</span>],</span><br><span class="line">    <span class="symbol">'body</span>-leading-blank': [<span class="number">1</span>, <span class="symbol">'always'</span>],</span><br><span class="line">    <span class="symbol">'footer</span>-leading-blank': [<span class="number">1</span>, <span class="symbol">'always'</span>],</span><br><span class="line"></span><br><span class="line">    <span class="symbol">'type</span>-case': [<span class="number">2</span>, <span class="symbol">'always'</span>, <span class="symbol">'lower</span>-case'],</span><br><span class="line">    <span class="symbol">'type</span>-empty': [<span class="number">2</span>, <span class="symbol">'never'</span>],</span><br><span class="line">    <span class="symbol">'type</span>-enum': [</span><br><span class="line">      <span class="number">2</span>,</span><br><span class="line">      <span class="symbol">'always'</span>,</span><br><span class="line">      [</span><br><span class="line">        <span class="symbol">'add'</span>,</span><br><span class="line">        <span class="symbol">'delete'</span>,</span><br><span class="line">        <span class="symbol">'modify'</span>,</span><br><span class="line">        <span class="symbol">'bugfix'</span>,</span><br><span class="line">        <span class="symbol">'optimize'</span></span><br><span class="line">      ]</span><br><span class="line">    ],</span><br><span class="line">    <span class="symbol">'scope</span>-empty': [<span class="number">2</span>, <span class="symbol">'never'</span>],</span><br><span class="line">    <span class="symbol">'scope</span>-case': [<span class="number">2</span>, <span class="symbol">'always'</span>, <span class="symbol">'lower</span>-case'],</span><br><span class="line"></span><br><span class="line">    <span class="symbol">'subject</span>-case': [</span><br><span class="line">      <span class="number">2</span>,</span><br><span class="line">      <span class="symbol">'never'</span>,</span><br><span class="line">      [<span class="symbol">'sentence</span>-case', <span class="symbol">'start</span>-case', <span class="symbol">'pascal</span>-case', <span class="symbol">'upper</span>-case']</span><br><span class="line">    ],</span><br><span class="line">    <span class="symbol">'subject</span>-empty': [<span class="number">2</span>, <span class="symbol">'never'</span>],</span><br><span class="line">    <span class="symbol">'subject</span>-full-stop': [<span class="number">2</span>, <span class="symbol">'never'</span>, <span class="string">'.'</span>],</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这里对type限定了只能是<code>add</code>、<code>delete</code>、<code>modify</code>、<code>bugfix</code>、<code>optimize</code>。以及配置了一些其他的规则，所有规则列表见<a href="https://github.com/conventional-changelog/commitlint/blob/master/docs/reference-rules.md" target="_blank" rel="noopener">Rules</a>。</p>
+<p><code>parser-preset</code>内容如下：</p>
+<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">module.exports = &#123;</span><br><span class="line">  parserOpts: &#123;</span><br><span class="line">    headerPattern: /^<span class="symbol">\[</span>(v<span class="symbol">\d</span>*<span class="symbol">\.</span><span class="symbol">\d</span>*<span class="symbol">\.</span><span class="symbol">\d</span>*)<span class="symbol">\]</span><span class="symbol">\[</span>(<span class="symbol">\w</span>*)<span class="symbol">\]</span>(.*)$/,</span><br><span class="line">    headerCorrespondence: ['scope', 'type', 'subject']</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这里我们限定了我们自己的scope、type和subject。正则部分有那个括号，分别对应scope、type、subject。所以我们的commit message是类似于这样的：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">v2.0.12</span>][<span class="symbol">modify</span>]这里是subject</span><br><span class="line"></span><br><span class="line">// 测试一下</span><br><span class="line">echo '[<span class="string">v2.0.12</span>][<span class="symbol">modify</span>]hello' | commitlint</span><br></pre></td></tr></table></figure>
+<p>scope比如以v开头，后面是数字版本号。</p>
+<p>如果这个commit message规范需要在多个项目中用到，则可以封装成一个npm包，方便在其他项目中使用。</p>
+<p><img src="https://store-g1.seewo.com/ea995b70a3bd4ab197aa0008357dbfe2" alt=""></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/commitlint/" rel="tag"># commitlint</a>
+              <a href="/tags/%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" rel="tag"># 代码规范</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/18/webpack-remove-gulp/index/" rel="prev" title="sourcemap引起的项目打包方案修改（移除gulp）">
+      <i class="fa fa-chevron-left"></i> sourcemap引起的项目打包方案修改（移除gulp）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码提交"><span class="nav-number">2.</span> <span class="nav-text">代码提交</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装依赖"><span class="nav-number">2.1.</span> <span class="nav-text">安装依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置commitlint"><span class="nav-number">2.2.</span> <span class="nav-text">配置commitlint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检测配置"><span class="nav-number">2.3.</span> <span class="nav-text">检测配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置自己的commitlint"><span class="nav-number">3.</span> <span class="nav-text">配置自己的commitlint</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Real"
+      src="/assets/images/avatar2.jpeg">
+  <p class="site-author-name" itemprop="name">Real</p>
+  <div class="site-description" itemprop="description">毕业于合肥工业大学，就职于cvte。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yuwanlin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yuwanlin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Real</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.1
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '561fdcc2fc7b29e33a3e',
+      clientSecret: 'cfca792daa526d7ee752ff5f5040d41f6bb0af68',
+      repo        : 'yuwanlin.github.io',
+      owner       : 'yuwanlin',
+      admin       : ['yuwanlin'],
+      id          : '57aff66ad3b301173aa688d6a5348954',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

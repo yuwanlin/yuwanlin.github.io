@@ -23,7 +23,7 @@
   <meta name="description" content="毕业于合肥工业大学，就职于cvte。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Real的博客">
-<meta property="og:url" content="https://yuwanlin.github.io/tags/%E5%85%B6%E4%BB%96/index.html">
+<meta property="og:url" content="https://yuwanlin.github.io/page/2/index.html">
 <meta property="og:site_name" content="Real的博客">
 <meta property="og:description" content="毕业于合肥工业大学，就职于cvte。">
 <meta property="og:locale" content="zh_CN">
@@ -31,19 +31,19 @@
 <meta property="article:tag" content="前端，typescript，react">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://yuwanlin.github.io/tags/%E5%85%B6%E4%BB%96/">
+<link rel="canonical" href="https://yuwanlin.github.io/page/2/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome: false,
+    isHome: true,
     isPost: false
   };
 </script>
 
-  <title>标签: 其他 | Real的博客</title>
+  <title>Real的博客</title>
   
 
 
@@ -155,49 +155,96 @@
           <div class="content">
             
 
+  <div class="posts-expand">
+        
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h1 class="collection-header">其他
-          <small>标签</small>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yuwanlin.github.io/2020/01/01/render-template/index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/assets/images/avatar2.jpeg">
+      <meta itemprop="name" content="Real">
+      <meta itemprop="description" content="毕业于合肥工业大学，就职于cvte。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Real的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/01/render-template/index/" class="post-title-link" itemprop="url">React render是天然的模板方法</a>
         </h1>
-      </div>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-01 00:00:00" itemprop="dateCreated datePublished" datetime="2020-01-01T00:00:00+08:00">2020-01-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-02 00:00:00" itemprop="dateModified" datetime="2020-01-02T00:00:00+08:00">2020-01-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <h1 class="collection-header">2020</h1>
+          <h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>模板方法模式中，抽象父类定义一个模板方法，模板方法中封装了程序的步骤或者框架，其中有一些共同的步骤父类提供默认的实现。对于不同的部分，父类提供抽象方法，不同的子类根据场景需要重写父类抽象方法。父类模板方法应当是不能被重写的，对应在java中就是final关键字，但是js中没有这个关键字。</p>
+<h2 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h2><p>模板方法模式适用于存在多个相同场景/步骤的情况下。比如泡茶和泡咖啡，都需要煮开水、放入原料、搅拌等步骤。虽然步骤名称相同，但是具体处理的内容可能是不同的（泡茶放入茶叶，泡咖啡放入咖啡粉末）。</p>
+<p>在前端，适用了那些同一个场景下多个不同的子场景，子场景拥有相同的元素（如图片，按钮，编辑框等），但是样式或者具体逻辑有所差别。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/01/render-template/index/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-05-14T23:35:07+08:00"
-              content="2020-05-14">
-          05-14
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/05/14/href/index/" itemprop="url">
-            <span itemprop="name">一次a[href='#']带来的问题</span>
-          </a>
-      </h2>
-
-    </header>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
   </article>
+  
+  
+  
 
-    </div>
   </div>
-  
-  
-  
 
   
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
